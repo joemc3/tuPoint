@@ -216,3 +216,4 @@ The MVP goal is to prove assumptions. Future analytics should measure:
 - **All coordinates** use WGS84 (SRID 4326)
 - **Client filters for 5km radius** - do not rely on PostGIS server-side spatial queries
 - **Specifications are source of truth** - update specs before implementing features
+- ALWAYS **IMPORTANT** create a new branch when making code changes in a new session.  Changes should not be made directly on main (but can be done if you ask permission - even if you previously had permission)
