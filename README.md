@@ -120,6 +120,22 @@ All data access is governed by PostgreSQL Row Level Security policies. The clien
 
 ## Development Workflow
 
+### Git Branching Policy ⚠️
+
+**All changes must be made on feature branches, not directly on `main`.**
+
+For each new work session:
+
+1. **Create a feature branch**: `git checkout -b feature/<descriptive-name>`
+2. **Make your changes** on the feature branch
+3. **Review changes** before committing: `git diff`
+4. **Commit** when ready (manually or via Claude)
+5. **Push and create PR** for review before merging to main
+
+**Exception**: Only commit directly to main with explicit approval for that specific change.
+
+See [CLAUDE.md](CLAUDE.md) for complete branching policy details.
+
 ### Adding New Features
 
 1. Update specification in `project_standards/`

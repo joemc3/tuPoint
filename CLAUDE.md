@@ -20,6 +20,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Exception**: Only commit to main with explicit user permission granted in the current session for that specific change.
 
+### Commit Policy
+
+**DO NOT auto-commit changes.** The user wants to review all changes before committing.
+
+- Make file changes as requested
+- Show diffs or summaries of changes
+- Wait for user to either:
+  - Manually commit using git commands, OR
+  - Explicitly ask you to commit with specific message
+
 ## Project Overview
 
 **tuPoint (tP.2)** is a specification-driven Flutter application for hyper-local, ephemeral social media where content disappears when users leave the area. The project uniquely combines detailed specification documents with specialized AI agents for implementation.
