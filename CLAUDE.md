@@ -2,6 +2,34 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ⚠️ CRITICAL: Git Branching Policy
+
+**BEFORE making ANY file changes (create, edit, or delete) in a new session:**
+
+1. **Check current branch**: Run `git branch --show-current`
+2. **If on `main`**: STOP and ask user for permission to either:
+   - Create a feature branch: `git checkout -b feature/<descriptive-name>`, OR
+   - Get explicit permission to commit directly to main for this specific change
+3. **Never assume permission**: Even if granted in a previous session, always verify for new sessions
+4. **This applies to**:
+   - All direct file operations (Write, Edit, NotebookEdit)
+   - All agent invocations that create/modify files
+   - All slash commands that generate files
+
+**New session triggers**: Start of conversation, after `/reset`, after `/compact`
+
+**Exception**: Only commit to main with explicit user permission granted in the current session for that specific change.
+
+### Commit Policy
+
+**DO NOT auto-commit changes.** The user wants to review all changes before committing.
+
+- Make file changes as requested
+- Show diffs or summaries of changes
+- Wait for user to either:
+  - Manually commit using git commands, OR
+  - Explicitly ask you to commit with specific message
+
 ## Project Overview
 
 **tuPoint (tP.2)** is a specification-driven Flutter application for hyper-local, ephemeral social media where content disappears when users leave the area. The project uniquely combines detailed specification documents with specialized AI agents for implementation.
@@ -216,4 +244,4 @@ The MVP goal is to prove assumptions. Future analytics should measure:
 - **All coordinates** use WGS84 (SRID 4326)
 - **Client filters for 5km radius** - do not rely on PostGIS server-side spatial queries
 - **Specifications are source of truth** - update specs before implementing features
-- ALWAYS **IMPORTANT** create a new branch when making code changes in a new session.  Changes should not be made directly on main (but can be done if you ask permission - even if you previously had permission)
+- **See branching policy above** - always verify branch before making changes
