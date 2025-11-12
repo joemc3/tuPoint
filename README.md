@@ -12,7 +12,7 @@ Every feature must reinforce this hyper-local, ephemeral nature. Content lives a
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Foundation Complete → Domain Entities Complete → Repository Interfaces Next
+**Development Phase**: Database Setup Complete → Domain Layer Foundation Complete → Domain Entities Complete → Repository Interfaces Complete → Use Cases Next
 
 ### Phase 0-1: Database Foundation ✅ COMPLETE
 
@@ -51,11 +51,20 @@ The domain entity layer is now implemented:
 - ✅ **JSON serialization** - Snake_case to camelCase mapping for database compatibility
 - ✅ **Entity test coverage** - 49 comprehensive tests for all entities
 
-### Next Phase: Repository Interfaces 🚧
+### Phase 3.2: Repository Interfaces ✅ COMPLETE
 
-Ready to implement (Phase 3.2):
-- ❌ **Repository interfaces** - Abstract contracts for data access (IPointsRepository, IProfileRepository, ILikesRepository)
-- ❌ **Use cases** - DropPoint, GetNearbyPoints, ToggleLike, CreateProfile (Phase 3.3)
+The domain repository contracts are now defined:
+- ✅ **IPointsRepository** - Abstract contract for Point CRUD operations (6 methods)
+- ✅ **IProfileRepository** - Abstract contract for Profile operations (5 methods)
+- ✅ **ILikesRepository** - Abstract contract for Like operations (6 methods)
+- ✅ **Domain exceptions** - 7 exception classes (UnauthorizedException, NotFoundException, ValidationException, etc.)
+- ✅ **RLS-aware design** - Repository methods mirror database RLS policies
+- ✅ **Technology-agnostic** - No Supabase imports, pure Dart interfaces
+
+### Next Phase: Use Cases 🚧
+
+Ready to implement (Phase 3.3):
+- ❌ **Use cases** - DropPointUseCase, GetNearbyPointsUseCase, ToggleLikeUseCase, CreateProfileUseCase
 - ❌ **Data layer** - Supabase repository implementations, DTOs (Phase 4)
 - ❌ **State management** - Riverpod providers wiring it all together (Phase 5)
 - ❌ **Business logic integration** - Connect backend to UI mockups (Phase 6)
@@ -70,7 +79,7 @@ Ready to implement (Phase 3.2):
 - **Frontend**: Flutter (iOS, Android, Web)
 - **Backend**: Supabase (PostgreSQL 17 + PostGIS + Auth) ✅ *database running locally*
 - **State Management**: Riverpod ✅ *dependencies installed, not yet wired*
-- **Architecture**: Clean Architecture (3-layer) ✅ *UI complete, domain utilities & entities complete, repositories/use cases/data pending*
+- **Architecture**: Clean Architecture (3-layer) ✅ *UI complete, domain layer complete (utilities, entities, repository interfaces), use cases/data/state pending*
 - **Security**: Row Level Security (RLS) policies ✅ *12 policies enforced at database level*
 - **Geospatial**: PostGIS storage ✅ *schema ready*, client-side Haversine filtering ✅ *utilities implemented & tested*
 
@@ -130,7 +139,8 @@ See [CLAUDE.md](CLAUDE.md) for complete development guidance.
 │   │   │   ├── utils/           # ✅ Geospatial utilities (Maidenhead, Haversine, Distance)
 │   │   │   ├── value_objects/   # ✅ LocationCoordinate
 │   │   │   ├── entities/        # ✅ Profile, Point, Like entities with Freezed
-│   │   │   ├── repositories/    # ❌ Not yet implemented
+│   │   │   ├── exceptions/      # ✅ Domain exceptions (7 exception classes)
+│   │   │   ├── repositories/    # ✅ Repository interfaces (IPointsRepository, IProfileRepository, ILikesRepository)
 │   │   │   └── use_cases/       # ❌ Not yet implemented
 │   │   └── data/                # ❌ Not yet implemented
 │   └── test/
@@ -232,7 +242,7 @@ tuPoint's unique location system combines server-side precision with client-side
   - "1.2 km" for distances 1km and above
   - Implemented in `DistanceFormatter` utility with parsing support
 
-**Status**: All geospatial utilities are implemented and tested (91 passing tests). Domain entities with LocationCoordinate integration complete (49 passing tests). Ready for use case and repository implementation.
+**Status**: All geospatial utilities are implemented and tested (91 passing tests). Domain entities with LocationCoordinate integration complete (49 passing tests). Repository interfaces defined with RLS-aware contracts. Ready for use case implementation.
 
 ## Development Workflow
 
