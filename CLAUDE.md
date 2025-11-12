@@ -38,30 +38,41 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current Status
 
-**Development Phase**: UI Mockup Implementation (No business logic)
+**Development Phase**: Database Setup Complete → Domain Layer Next
 
-The Flutter app currently contains:
+### Completed (Phase 0-1): ✅
+- ✅ **Local Supabase Environment** - Docker containers running with PostgreSQL 17 + PostGIS
+- ✅ **Database Schema** - 4 migrations applied (profile, points, likes tables)
+- ✅ **Row Level Security (RLS)** - 12 policies enforcing authorization at database level
+- ✅ **PostGIS Spatial Support** - GEOMETRY(POINT, 4326) for lat/lon storage
+- ✅ **Auth Providers** - Email/Password, Google OAuth, Apple Sign In configured
+- ✅ **Environment Config** - `.env` and `env_config.dart` for local development
 - ✅ **Full UI mockups** with hardcoded test data for visual demonstration
 - ✅ **v3.0 "BLUE DOMINANCE" theme** - Location Blue (#3A9BFC) prominently featured throughout
 - ✅ **3 navigable screens**: Authentication Gate → Main Feed (with 5 Point cards) → Point Creation
 - ✅ **Material 3 design** with Inter typography
 - ✅ **100% theme compliance** - zero hardcoded colors, fonts, or sizes
-- ❌ **No state management** (Riverpod not yet integrated)
-- ❌ **No business logic** (buttons skip to next screen, no data persistence)
-- ❌ **No API integration** (no Supabase connection yet)
-- ❌ **No authentication** (OAuth buttons navigate directly to feed)
 
-**Branch**: All mockup work is on `feature/ui-mockups-with-test-data`
+### Not Yet Implemented: ❌
+- ❌ **Domain Layer** (entities, use cases, repository interfaces)
+- ❌ **Data Layer** (Supabase repository implementations, DTOs)
+- ❌ **State Management** (Riverpod providers not yet integrated)
+- ❌ **Business Logic** (buttons skip to next screen, no data persistence)
+- ❌ **API Integration** (Supabase client not wired to UI)
+- ❌ **Real Authentication** (OAuth buttons navigate directly to feed)
+- ❌ **Geolocation Services** (Maidenhead calculator, Haversine distance)
 
-**Next Steps**: Implement actual business logic, state management, and Supabase integration.
+**Next Phase**: Domain Layer (entities, use cases, repository interfaces, geospatial utilities)
 
 ## Project Structure
 
 ```
 /Users/joemc3/tmp/tuPoint/
-├── app/                          # Flutter application (UI mockups with test data)
+├── app/                          # Flutter application
+│   ├── .env                      # Local Supabase credentials (gitignored)
 │   ├── lib/
 │   │   ├── core/
+│   │   │   ├── config/          # Environment configuration
 │   │   │   ├── constants/       # App-wide constants (spacing, sizes, colors)
 │   │   │   └── theme/           # Material 3 theme v3.0 (BLUE DOMINANCE)
 │   │   ├── presentation/
@@ -70,6 +81,13 @@ The Flutter app currently contains:
 │   │   ├── domain/              # (Not yet implemented)
 │   │   └── data/                # (Not yet implemented)
 │   └── test/                    # Basic widget tests
+├── supabase/                     # Supabase configuration
+│   ├── config.toml              # Auth providers, API settings
+│   └── migrations/              # Database schema migrations (4 files)
+│       ├── 20251112143441_enable_postgis.sql
+│       ├── 20251112143459_create_profile_table.sql
+│       ├── 20251112143529_create_points_table.sql
+│       └── 20251112143615_create_likes_table.sql
 ├── project_standards/            # Detailed specifications (source of truth)
 │   ├── architecture_and_state_management.md
 │   ├── api_strategy.md
@@ -79,7 +97,8 @@ The Flutter app currently contains:
 │   ├── testing_strategy.md
 │   └── project-theme.md         # v3.0 - Aggressive Location Blue usage
 ├── general_standards/            # Flutter/UX best practices
-└── .claude/                      # Agents and commands
+├── .claude/                      # Agents and commands
+└── .env.example                  # OAuth setup documentation
 ```
 
 ## Development Commands
@@ -114,7 +133,33 @@ dart fix --apply              # Auto-fix lints
 
 ### Supabase Commands
 
-Use the custom slash commands for database operations:
+**Local Development (Docker):**
+
+```bash
+# Start Supabase services
+supabase start
+
+# Stop Supabase services
+supabase stop
+
+# Reset database (reapplies all migrations)
+supabase db reset
+
+# Create new migration
+supabase migration new <migration_name>
+
+# View status
+supabase status
+
+# View logs
+supabase logs -f
+```
+
+**Supabase Studio (GUI):**
+- Open `http://127.0.0.1:54323` for visual database management
+- View tables, run SQL queries, inspect RLS policies
+
+**Custom slash commands for advanced operations:**
 
 ```bash
 /supabase-migration-assistant --create    # Create migration
@@ -123,6 +168,8 @@ Use the custom slash commands for database operations:
 /supabase-security-audit --comprehensive  # Run security audit
 /supabase-data-explorer --inspect        # Explore database
 ```
+
+**Note**: MCP tools require access token configuration. For local dev, use `supabase` CLI commands directly.
 
 ### Theme Generation
 
