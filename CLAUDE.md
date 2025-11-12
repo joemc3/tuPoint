@@ -38,31 +38,47 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Next
+**Development Phase**: Database Setup Complete → Domain Layer Foundation Complete → Domain Entities Next
 
-### Completed (Phase 0-1): ✅
+### Completed (Phase 0-2.1): ✅
+
+**Backend & Infrastructure:**
 - ✅ **Local Supabase Environment** - Docker containers running with PostgreSQL 17 + PostGIS
 - ✅ **Database Schema** - 4 migrations applied (profile, points, likes tables)
 - ✅ **Row Level Security (RLS)** - 12 policies enforcing authorization at database level
 - ✅ **PostGIS Spatial Support** - GEOMETRY(POINT, 4326) for lat/lon storage
 - ✅ **Auth Providers** - Email/Password, Google OAuth, Apple Sign In configured
 - ✅ **Environment Config** - `.env` and `env_config.dart` for local development
+
+**Presentation Layer (UI Only):**
 - ✅ **Full UI mockups** with hardcoded test data for visual demonstration
 - ✅ **v3.0 "BLUE DOMINANCE" theme** - Location Blue (#3A9BFC) prominently featured throughout
 - ✅ **3 navigable screens**: Authentication Gate → Main Feed (with 5 Point cards) → Point Creation
 - ✅ **Material 3 design** with Inter typography
 - ✅ **100% theme compliance** - zero hardcoded colors, fonts, or sizes
 
+**Domain Layer Foundation (NEW - Phase 2.1):**
+- ✅ **Dependencies Installed** - Riverpod, Supabase, Geolocator, Freezed, JSON serialization packages
+- ✅ **LocationCoordinate Value Object** - Immutable lat/lon with validation
+- ✅ **MaidenheadConverter Utility** - Ham radio grid square system (~800m precision)
+- ✅ **HaversineCalculator Utility** - Great-circle distance calculation (<0.5% error)
+- ✅ **DistanceFormatter Utility** - Human-readable distance display
+- ✅ **Comprehensive Test Coverage** - 91 passing tests for all geospatial utilities
+
+### In Progress: 🚧
+- 🚧 **Domain Layer Entities** - Point, Profile, Like models (next step)
+
 ### Not Yet Implemented: ❌
-- ❌ **Domain Layer** (entities, use cases, repository interfaces)
+- ❌ **Domain Layer Use Cases** (business logic)
+- ❌ **Domain Layer Repository Interfaces** (contracts)
 - ❌ **Data Layer** (Supabase repository implementations, DTOs)
 - ❌ **State Management** (Riverpod providers not yet integrated)
-- ❌ **Business Logic** (buttons skip to next screen, no data persistence)
+- ❌ **Business Logic Wiring** (buttons skip to next screen, no data persistence)
 - ❌ **API Integration** (Supabase client not wired to UI)
 - ❌ **Real Authentication** (OAuth buttons navigate directly to feed)
-- ❌ **Geolocation Services** (Maidenhead calculator, Haversine distance)
+- ❌ **Location Services Integration** (GPS permission handling, real-time location)
 
-**Next Phase**: Domain Layer (entities, use cases, repository interfaces, geospatial utilities)
+**Next Phase**: Domain Layer Entities (Point, Profile, Like entities), then Repository Interfaces, then Use Cases
 
 ## Project Structure
 
@@ -78,9 +94,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   │   ├── presentation/
 │   │   │   ├── screens/         # Auth, MainFeed, PointCreation screens
 │   │   │   └── widgets/         # Reusable PointCard component
-│   │   ├── domain/              # (Not yet implemented)
+│   │   ├── domain/              # Domain layer (business logic)
+│   │   │   ├── utils/           # Geospatial calculation utilities ✅
+│   │   │   │   ├── maidenhead_converter.dart
+│   │   │   │   ├── haversine_calculator.dart
+│   │   │   │   └── distance_formatter.dart
+│   │   │   ├── value_objects/   # Immutable value objects ✅
+│   │   │   │   └── location_coordinate.dart
+│   │   │   ├── entities/        # (Not yet implemented)
+│   │   │   ├── repositories/    # (Not yet implemented)
+│   │   │   └── use_cases/       # (Not yet implemented)
 │   │   └── data/                # (Not yet implemented)
-│   └── test/                    # Basic widget tests
+│   └── test/
+│       ├── widget_test.dart     # Basic widget test
+│       └── domain/              # Domain layer tests ✅
+│           └── utils/           # 91 passing tests for geospatial utilities
 ├── supabase/                     # Supabase configuration
 │   ├── config.toml              # Auth providers, API settings
 │   └── migrations/              # Database schema migrations (4 files)

@@ -12,7 +12,7 @@ Every feature must reinforce this hyper-local, ephemeral nature. Content lives a
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Next
+**Development Phase**: Database Setup Complete → Domain Layer Foundation Complete → Domain Entities Next
 
 ### Phase 0-1: Database Foundation ✅ COMPLETE
 
@@ -32,29 +32,39 @@ The frontend mockups demonstrate the design:
 - ✅ **Material 3 design** with Inter typography and 100% theme compliance
 - ✅ **Navigable screens**: Auth Gate → Main Feed (5 test Points) → Point Creation
 
-### Next Phase: Domain Layer ⏭️
+### Phase 2.1: Domain Layer Foundation ✅ COMPLETE
 
-Ready to implement:
-- ❌ **Domain entities** - Point, Profile, Like, Location models with Freezed
-- ❌ **Repository interfaces** - Abstract contracts for data access
-- ❌ **Use cases** - DropPoint, GetNearbyPoints, ToggleLike, CreateProfile
-- ❌ **Geospatial utilities** - Maidenhead calculator, Haversine distance
-- ❌ **Data layer** - Supabase repository implementations, DTOs
-- ❌ **State management** - Riverpod providers wiring it all together
-- ❌ **Business logic integration** - Connect backend to UI mockups
+The core geospatial utilities are now implemented:
+- ✅ **All dependencies installed** - Riverpod, Supabase, Geolocator, Freezed, JSON serialization
+- ✅ **LocationCoordinate value object** - Immutable lat/lon with validation
+- ✅ **MaidenheadConverter utility** - Ham radio grid square system (~800m precision)
+- ✅ **HaversineCalculator utility** - Great-circle distance calculation (<0.5% error)
+- ✅ **DistanceFormatter utility** - Human-readable distance display ("X.X km")
+- ✅ **Comprehensive test coverage** - 91 passing tests for all utilities
+
+### Next Phase: Domain Entities 🚧
+
+Ready to implement (Phase 2.2):
+- ❌ **Domain entities** - Point, Profile, Like models with Freezed
+- ❌ **Repository interfaces** - Abstract contracts for data access (Phase 2.3)
+- ❌ **Use cases** - DropPoint, GetNearbyPoints, ToggleLike, CreateProfile (Phase 2.4)
+- ❌ **Data layer** - Supabase repository implementations, DTOs (Phase 3)
+- ❌ **State management** - Riverpod providers wiring it all together (Phase 4)
+- ❌ **Business logic integration** - Connect backend to UI mockups (Phase 5)
 
 **Quick Start:**
 - Run `flutter run` in the `app/` directory to see the UI mockup
+- Run `flutter test` to run all 92 tests (91 domain utilities + 1 widget test)
 - Run `supabase start` to launch the local database environment
 
 ## Tech Stack
 
 - **Frontend**: Flutter (iOS, Android, Web)
 - **Backend**: Supabase (PostgreSQL 17 + PostGIS + Auth) ✅ *database running locally*
-- **State Management**: Riverpod *(planned, not yet implemented)*
-- **Architecture**: Clean Architecture (3-layer) *(UI complete, domain/data pending)*
+- **State Management**: Riverpod ✅ *dependencies installed, not yet wired*
+- **Architecture**: Clean Architecture (3-layer) ✅ *UI complete, domain utilities complete, entities/data pending*
 - **Security**: Row Level Security (RLS) policies ✅ *12 policies enforced at database level*
-- **Geospatial**: PostGIS storage ✅ *schema ready*, client-side Haversine filtering *(pending)*
+- **Geospatial**: PostGIS storage ✅ *schema ready*, client-side Haversine filtering ✅ *utilities implemented & tested*
 
 ## Quick Start
 
@@ -108,9 +118,16 @@ See [CLAUDE.md](CLAUDE.md) for complete development guidance.
 │   │   ├── presentation/
 │   │   │   ├── screens/         # ✅ Auth, MainFeed, PointCreation (mockups)
 │   │   │   └── widgets/         # ✅ PointCard component
-│   │   ├── domain/              # ❌ Not yet implemented
+│   │   ├── domain/              # 🚧 Domain layer (in progress)
+│   │   │   ├── utils/           # ✅ Geospatial utilities (Maidenhead, Haversine, Distance)
+│   │   │   ├── value_objects/   # ✅ LocationCoordinate
+│   │   │   ├── entities/        # ❌ Not yet implemented
+│   │   │   ├── repositories/    # ❌ Not yet implemented
+│   │   │   └── use_cases/       # ❌ Not yet implemented
 │   │   └── data/                # ❌ Not yet implemented
-│   └── test/                    # ✅ Basic widget tests
+│   └── test/
+│       ├── widget_test.dart     # ✅ Basic widget test (1 test)
+│       └── domain/utils/        # ✅ Geospatial utility tests (91 tests)
 ├── supabase/                     # ✅ Supabase configuration
 │   ├── config.toml              # ✅ Auth providers, API settings
 │   └── migrations/              # ✅ Database schema (4 migrations)
@@ -189,9 +206,23 @@ All data access is governed by PostgreSQL Row Level Security policies. The clien
 
 ### Geospatial Design
 
-- **PostGIS** stores precise coordinates (`geom` POINT field)
-- **Maidenhead Locator** provides ~800m precision for public display (6-char grid square)
-- **Client-side filtering** calculates Haversine distance locally (5km radius)
+tuPoint's unique location system combines server-side precision with client-side privacy:
+
+- **PostGIS Storage**: Stores precise coordinates in `geom` POINT field (SRID 4326)
+- **Maidenhead Grid Locators**: Ham radio 6-character grid squares (~800m precision) for approximate location display
+  - Example: Boston @ 42.3601°N, 71.0589°W → "FN42li"
+  - Prevents exact coordinate exposure while maintaining neighborhood-level accuracy
+  - Implemented in `MaidenheadConverter` utility (bidirectional encoding/decoding)
+- **Client-side Haversine Filtering**: Calculates great-circle distances locally
+  - Filters Points within 5km radius of user location
+  - <0.5% error for distances under 100km
+  - Implemented in `HaversineCalculator` utility with bearing and destination methods
+- **Human-Readable Distances**: Formats distances for UI display
+  - "456 m" for distances under 1km
+  - "1.2 km" for distances 1km and above
+  - Implemented in `DistanceFormatter` utility with parsing support
+
+**Status**: All geospatial utilities are implemented and tested (91 passing tests). Ready for integration into domain entities and use cases.
 
 ## Development Workflow
 
