@@ -36,11 +36,40 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Key Principle**: "Content disappears when you leave the area" - every feature must reinforce this hyper-local, ephemeral nature.
 
+## Current Status
+
+**Development Phase**: UI Mockup Implementation (No business logic)
+
+The Flutter app currently contains:
+- ✅ **Full UI mockups** with hardcoded test data for visual demonstration
+- ✅ **v3.0 "BLUE DOMINANCE" theme** - Location Blue (#3A9BFC) prominently featured throughout
+- ✅ **3 navigable screens**: Authentication Gate → Main Feed (with 5 Point cards) → Point Creation
+- ✅ **Material 3 design** with Inter typography
+- ✅ **100% theme compliance** - zero hardcoded colors, fonts, or sizes
+- ❌ **No state management** (Riverpod not yet integrated)
+- ❌ **No business logic** (buttons skip to next screen, no data persistence)
+- ❌ **No API integration** (no Supabase connection yet)
+- ❌ **No authentication** (OAuth buttons navigate directly to feed)
+
+**Branch**: All mockup work is on `feature/ui-mockups-with-test-data`
+
+**Next Steps**: Implement actual business logic, state management, and Supabase integration.
+
 ## Project Structure
 
 ```
 /Users/joemc3/tmp/tuPoint/
-├── app/                          # Flutter application (minimal scaffold currently)
+├── app/                          # Flutter application (UI mockups with test data)
+│   ├── lib/
+│   │   ├── core/
+│   │   │   ├── constants/       # App-wide constants (spacing, sizes, colors)
+│   │   │   └── theme/           # Material 3 theme v3.0 (BLUE DOMINANCE)
+│   │   ├── presentation/
+│   │   │   ├── screens/         # Auth, MainFeed, PointCreation screens
+│   │   │   └── widgets/         # Reusable PointCard component
+│   │   ├── domain/              # (Not yet implemented)
+│   │   └── data/                # (Not yet implemented)
+│   └── test/                    # Basic widget tests
 ├── project_standards/            # Detailed specifications (source of truth)
 │   ├── architecture_and_state_management.md
 │   ├── api_strategy.md
@@ -48,7 +77,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   ├── tuPoint_data_schema.md
 │   ├── UX_user_flow.md
 │   ├── testing_strategy.md
-│   └── project-theme.md
+│   └── project-theme.md         # v3.0 - Aggressive Location Blue usage
 ├── general_standards/            # Flutter/UX best practices
 └── .claude/                      # Agents and commands
 ```
@@ -100,6 +129,39 @@ Use the custom slash commands for database operations:
 ```bash
 /createThemeTemplate [requirements]       # Generate theme specification
 ```
+
+## Visual Design: Theme v3.0 "BLUE DOMINANCE"
+
+The app uses an aggressively bold theme where **Location Blue (#3A9BFC) dominates every screen**. This is not a subtle accent color—blue is the defining visual characteristic.
+
+### Theme Characteristics
+
+**Light Theme - "BLUE IMMERSION":**
+- Background: `#D6EEFF` - Obviously blue, impossible to miss
+- Cards: `#F0F7FF` blue-tinted with **3dp solid blue borders**
+- Chips: `#99CCFF` - Saturated blue for Maidenhead codes
+- FAB: Location Blue with massive 24dp glow effect
+- Dividers: 30% opacity blue lines between cards
+
+**Dark Theme - "BLUE ELECTRIC":**
+- Background: `#0F1A26` - Dark with clear blue tint
+- Cards: `#1A2836` blue-tinted with **2dp glowing blue borders + aura effect**
+- Primary: `#66B8FF` - Brighter electric blue that glows
+- FAB: Dual-layer glow (24dp + 32dp blur) for maximum impact
+- Dividers: 40% opacity glowing blue lines
+
+### Design Principles
+
+1. **100% Theme Compliance**: Zero hardcoded colors, fonts, or sizes anywhere in presentation layer
+2. **Constants-Driven**: All spacing, sizes, and style values reference `AppConstants`
+3. **Accessibility First**: All combinations achieve WCAG 2.1 AA (most achieve AAA)
+4. **Material 3**: Uses latest Material Design components with proper theming
+
+### Key Files
+
+- **Theme Spec**: `project_standards/project-theme.md` (v3.0 with detailed color tables)
+- **Theme Implementation**: `app/lib/core/theme/app_theme.dart`
+- **Constants**: `app/lib/core/constants/app_constants.dart`
 
 ## Architecture
 

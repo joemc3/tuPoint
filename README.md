@@ -10,14 +10,31 @@ tuPoint makes every post ("Point") an exclusive, in-the-moment local discovery. 
 
 Every feature must reinforce this hyper-local, ephemeral nature. Content lives and dies by proximity.
 
+## Current Status
+
+**Development Phase**: UI Mockup with Test Data
+
+The app currently features:
+- ✅ **Complete UI mockups** demonstrating the full user flow
+- ✅ **v3.0 "BLUE DOMINANCE" theme** - Location Blue aggressively featured throughout
+- ✅ **Material 3 design** with Inter typography and 100% theme compliance
+- ✅ **Navigable screens**: Auth Gate → Main Feed (5 test Points) → Point Creation
+- ❌ **No business logic yet** - buttons skip actions and navigate to next screen
+- ❌ **No API integration** - all data is hardcoded for demonstration
+- ❌ **No state management** - Riverpod not yet implemented
+
+**Current Branch**: `feature/ui-mockups-with-test-data`
+
+Run `flutter run` in the `app/` directory to see the mockup in action!
+
 ## Tech Stack
 
 - **Frontend**: Flutter (iOS, Android, Web)
-- **Backend**: Supabase (PostgreSQL + PostGIS + Auth)
-- **State Management**: Riverpod
-- **Architecture**: Clean Architecture (3-layer)
-- **Security**: Row Level Security (RLS) policies
-- **Geospatial**: PostGIS storage, client-side Haversine filtering (5km radius)
+- **Backend**: Supabase (PostgreSQL + PostGIS + Auth) *(not yet integrated)*
+- **State Management**: Riverpod *(planned, not yet implemented)*
+- **Architecture**: Clean Architecture (3-layer) *(UI layer complete, domain/data pending)*
+- **Security**: Row Level Security (RLS) policies *(specification complete, implementation pending)*
+- **Geospatial**: PostGIS storage, client-side Haversine filtering (5km radius) *(pending)*
 
 ## Quick Start
 
@@ -51,10 +68,15 @@ See [CLAUDE.md](CLAUDE.md) for complete development guidance.
 ```
 ├── app/                          # Flutter application
 │   ├── lib/
-│   │   ├── presentation/        # UI widgets, screens, view models
-│   │   ├── domain/              # Business logic, entities, use cases
-│   │   └── data/                # Supabase integration, repositories
-│   └── test/                    # Unit, widget, integration tests
+│   │   ├── core/
+│   │   │   ├── constants/       # ✅ App-wide constants (spacing, sizes, colors)
+│   │   │   └── theme/           # ✅ Material 3 theme v3.0 (BLUE DOMINANCE)
+│   │   ├── presentation/
+│   │   │   ├── screens/         # ✅ Auth, MainFeed, PointCreation (mockups)
+│   │   │   └── widgets/         # ✅ PointCard component
+│   │   ├── domain/              # ❌ Not yet implemented
+│   │   └── data/                # ❌ Not yet implemented
+│   └── test/                    # ✅ Basic widget tests
 ├── project_standards/           # Architectural specifications (source of truth)
 │   ├── architecture_and_state_management.md
 │   ├── api_strategy.md
@@ -62,18 +84,33 @@ See [CLAUDE.md](CLAUDE.md) for complete development guidance.
 │   ├── tuPoint_data_schema.md
 │   ├── UX_user_flow.md
 │   ├── testing_strategy.md
-│   └── project-theme.md
+│   └── project-theme.md         # ✅ v3.0 - Aggressive Location Blue usage
 ├── general_standards/           # Flutter/UX best practices
 └── .claude/                     # AI agents and automation commands
 ```
 
 ## Core Features (MVP)
 
-- **Sign Up**: OAuth (Google, Apple) via Supabase Auth
-- **Drop a Point**: Create location-based posts with text content
-- **View Nearby Points**: See posts within 5km radius
-- **Like Points**: Simple social interaction
-- **Profile Creation**: Username + optional bio
+- **Sign Up**: OAuth (Google, Apple) via Supabase Auth *(mockup only)*
+- **Drop a Point**: Create location-based posts with text content *(mockup only)*
+- **View Nearby Points**: See posts within 5km radius *(mockup with test data)*
+- **Like Points**: Simple social interaction *(mockup with visual toggle)*
+- **Profile Creation**: Username + optional bio *(not in mockup flow)*
+
+## Visual Design: Theme v3.0 "BLUE DOMINANCE"
+
+The app uses an **aggressively bold theme** where Location Blue (#3A9BFC) is the dominant visual element. Blue is everywhere—backgrounds, borders, glows, dividers, and highlights.
+
+### Key Design Features
+
+- **Light Mode**: Obviously blue background (`#D6EEFF`), all cards have 3dp solid blue borders
+- **Dark Mode**: Blue glows everywhere - 2dp borders with aura effects, brighter electric blue (`#66B8FF`)
+- **FAB Glow**: Massive 24-32dp blue glow effects that command attention
+- **Saturated Chips**: Maidenhead codes in bright blue (`#99CCFF`)
+- **Blue Dividers**: 30-40% opacity blue lines between all cards
+- **100% Theme Compliance**: Zero hardcoded colors, fonts, or sizes
+
+See `project_standards/project-theme.md` for complete v3.0 specifications.
 
 ## Architectural Highlights
 
