@@ -12,7 +12,7 @@ Every feature must reinforce this hyper-local, ephemeral nature. Content lives a
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Foundation Complete → Domain Entities Next
+**Development Phase**: Database Setup Complete → Domain Layer Foundation Complete → Domain Entities Complete → Repository Interfaces Next
 
 ### Phase 0-1: Database Foundation ✅ COMPLETE
 
@@ -42,19 +42,27 @@ The core geospatial utilities are now implemented:
 - ✅ **DistanceFormatter utility** - Human-readable distance display ("X.X km")
 - ✅ **Comprehensive test coverage** - 91 passing tests for all utilities
 
-### Next Phase: Domain Entities 🚧
+### Phase 3.1: Domain Entities ✅ COMPLETE
 
-Ready to implement (Phase 2.2):
-- ❌ **Domain entities** - Point, Profile, Like models with Freezed
-- ❌ **Repository interfaces** - Abstract contracts for data access (Phase 2.3)
-- ❌ **Use cases** - DropPoint, GetNearbyPoints, ToggleLike, CreateProfile (Phase 2.4)
-- ❌ **Data layer** - Supabase repository implementations, DTOs (Phase 3)
-- ❌ **State management** - Riverpod providers wiring it all together (Phase 4)
-- ❌ **Business logic integration** - Connect backend to UI mockups (Phase 5)
+The domain entity layer is now implemented:
+- ✅ **Profile entity** - Freezed immutable model with id, username, bio, timestamps (25 tests)
+- ✅ **Point entity** - Freezed model with LocationCoordinate integration, PostGIS geometry converter (16 tests)
+- ✅ **Like entity** - Freezed model representing composite key relationship (8 tests)
+- ✅ **JSON serialization** - Snake_case to camelCase mapping for database compatibility
+- ✅ **Entity test coverage** - 49 comprehensive tests for all entities
+
+### Next Phase: Repository Interfaces 🚧
+
+Ready to implement (Phase 3.2):
+- ❌ **Repository interfaces** - Abstract contracts for data access (IPointsRepository, IProfileRepository, ILikesRepository)
+- ❌ **Use cases** - DropPoint, GetNearbyPoints, ToggleLike, CreateProfile (Phase 3.3)
+- ❌ **Data layer** - Supabase repository implementations, DTOs (Phase 4)
+- ❌ **State management** - Riverpod providers wiring it all together (Phase 5)
+- ❌ **Business logic integration** - Connect backend to UI mockups (Phase 6)
 
 **Quick Start:**
 - Run `flutter run` in the `app/` directory to see the UI mockup
-- Run `flutter test` to run all 92 tests (91 domain utilities + 1 widget test)
+- Run `flutter test` to run all 141 tests (91 utils + 49 entities + 1 widget)
 - Run `supabase start` to launch the local database environment
 
 ## Tech Stack
@@ -62,7 +70,7 @@ Ready to implement (Phase 2.2):
 - **Frontend**: Flutter (iOS, Android, Web)
 - **Backend**: Supabase (PostgreSQL 17 + PostGIS + Auth) ✅ *database running locally*
 - **State Management**: Riverpod ✅ *dependencies installed, not yet wired*
-- **Architecture**: Clean Architecture (3-layer) ✅ *UI complete, domain utilities complete, entities/data pending*
+- **Architecture**: Clean Architecture (3-layer) ✅ *UI complete, domain utilities & entities complete, repositories/use cases/data pending*
 - **Security**: Row Level Security (RLS) policies ✅ *12 policies enforced at database level*
 - **Geospatial**: PostGIS storage ✅ *schema ready*, client-side Haversine filtering ✅ *utilities implemented & tested*
 
@@ -121,13 +129,15 @@ See [CLAUDE.md](CLAUDE.md) for complete development guidance.
 │   │   ├── domain/              # 🚧 Domain layer (in progress)
 │   │   │   ├── utils/           # ✅ Geospatial utilities (Maidenhead, Haversine, Distance)
 │   │   │   ├── value_objects/   # ✅ LocationCoordinate
-│   │   │   ├── entities/        # ❌ Not yet implemented
+│   │   │   ├── entities/        # ✅ Profile, Point, Like entities with Freezed
 │   │   │   ├── repositories/    # ❌ Not yet implemented
 │   │   │   └── use_cases/       # ❌ Not yet implemented
 │   │   └── data/                # ❌ Not yet implemented
 │   └── test/
 │       ├── widget_test.dart     # ✅ Basic widget test (1 test)
-│       └── domain/utils/        # ✅ Geospatial utility tests (91 tests)
+│       └── domain/              # ✅ Domain layer tests (140 tests)
+│           ├── utils/           # ✅ Geospatial utility tests (91 tests)
+│           └── entities/        # ✅ Entity tests (49 tests)
 ├── supabase/                     # ✅ Supabase configuration
 │   ├── config.toml              # ✅ Auth providers, API settings
 │   └── migrations/              # ✅ Database schema (4 migrations)
@@ -222,7 +232,7 @@ tuPoint's unique location system combines server-side precision with client-side
   - "1.2 km" for distances 1km and above
   - Implemented in `DistanceFormatter` utility with parsing support
 
-**Status**: All geospatial utilities are implemented and tested (91 passing tests). Ready for integration into domain entities and use cases.
+**Status**: All geospatial utilities are implemented and tested (91 passing tests). Domain entities with LocationCoordinate integration complete (49 passing tests). Ready for use case and repository implementation.
 
 ## Development Workflow
 

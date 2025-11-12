@@ -38,9 +38,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Foundation Complete → Domain Entities Next
+**Development Phase**: Database Setup Complete → Domain Layer Foundation Complete → Domain Entities Complete → Repository Interfaces Next
 
-### Completed (Phase 0-2.1): ✅
+### Completed (Phase 0-3.1): ✅
 
 **Backend & Infrastructure:**
 - ✅ **Local Supabase Environment** - Docker containers running with PostgreSQL 17 + PostGIS
@@ -57,7 +57,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ **Material 3 design** with Inter typography
 - ✅ **100% theme compliance** - zero hardcoded colors, fonts, or sizes
 
-**Domain Layer Foundation (NEW - Phase 2.1):**
+**Domain Layer Foundation (Phase 2.1):**
 - ✅ **Dependencies Installed** - Riverpod, Supabase, Geolocator, Freezed, JSON serialization packages
 - ✅ **LocationCoordinate Value Object** - Immutable lat/lon with validation
 - ✅ **MaidenheadConverter Utility** - Ham radio grid square system (~800m precision)
@@ -65,12 +65,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ **DistanceFormatter Utility** - Human-readable distance display
 - ✅ **Comprehensive Test Coverage** - 91 passing tests for all geospatial utilities
 
-### In Progress: 🚧
-- 🚧 **Domain Layer Entities** - Point, Profile, Like models (next step)
+**Domain Layer Entities (NEW - Phase 3.1):**
+- ✅ **Profile Entity** - Freezed immutable model with id, username, bio, timestamps
+- ✅ **Point Entity** - Freezed model with LocationCoordinate integration, PostGIS geometry converter
+- ✅ **Like Entity** - Freezed model representing composite key relationship
+- ✅ **JSON Serialization** - Snake_case to camelCase mapping for all entities
+- ✅ **Entity Test Coverage** - 49 comprehensive tests for all entities (25 Profile, 16 Point, 8 Like)
+- ✅ **Total Test Coverage** - 141 passing tests (91 utils + 49 entities + 1 widget)
 
 ### Not Yet Implemented: ❌
+- ❌ **Domain Layer Repository Interfaces** (contracts for data access)
 - ❌ **Domain Layer Use Cases** (business logic)
-- ❌ **Domain Layer Repository Interfaces** (contracts)
 - ❌ **Data Layer** (Supabase repository implementations, DTOs)
 - ❌ **State Management** (Riverpod providers not yet integrated)
 - ❌ **Business Logic Wiring** (buttons skip to next screen, no data persistence)
@@ -78,7 +83,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ❌ **Real Authentication** (OAuth buttons navigate directly to feed)
 - ❌ **Location Services Integration** (GPS permission handling, real-time location)
 
-**Next Phase**: Domain Layer Entities (Point, Profile, Like entities), then Repository Interfaces, then Use Cases
+**Next Phase**: Repository Interfaces (Phase 3.2), then Use Cases (Phase 3.3), then Data Layer (Phase 4)
 
 ## Project Structure
 
@@ -101,14 +106,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   │   │   │   └── distance_formatter.dart
 │   │   │   ├── value_objects/   # Immutable value objects ✅
 │   │   │   │   └── location_coordinate.dart
-│   │   │   ├── entities/        # (Not yet implemented)
+│   │   │   ├── entities/        # Domain entities with Freezed ✅
+│   │   │   │   ├── profile.dart (+ .freezed.dart, .g.dart)
+│   │   │   │   ├── point.dart (+ .freezed.dart, .g.dart)
+│   │   │   │   └── like.dart (+ .freezed.dart, .g.dart)
 │   │   │   ├── repositories/    # (Not yet implemented)
 │   │   │   └── use_cases/       # (Not yet implemented)
 │   │   └── data/                # (Not yet implemented)
 │   └── test/
-│       ├── widget_test.dart     # Basic widget test
+│       ├── widget_test.dart     # Basic widget test (1 test)
 │       └── domain/              # Domain layer tests ✅
-│           └── utils/           # 91 passing tests for geospatial utilities
+│           ├── utils/           # Geospatial utility tests (91 tests)
+│           └── entities/        # Entity tests (49 tests)
 ├── supabase/                     # Supabase configuration
 │   ├── config.toml              # Auth providers, API settings
 │   └── migrations/              # Database schema migrations (4 files)
