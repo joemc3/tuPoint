@@ -1,11 +1,11 @@
 {
-    "name": "app",
-    "short_name": "app",
+    "name": "tuPoint2",
+    "short_name": "tuPoint2",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "tuPoint - Hyper-local, ephemeral social media (v2)",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
