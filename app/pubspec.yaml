@@ -38,6 +38,22 @@ dependencies:
   # Inter font family for Material 3 typography
   google_fonts: ^6.1.0
 
+  # State management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Backend
+  supabase_flutter: ^2.8.0
+
+  # Location services
+  geolocator: ^13.0.2
+
+  # Immutable models - annotation only in dependencies
+  freezed_annotation: ^2.4.4
+
+  # JSON serialization
+  json_annotation: ^4.9.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -48,6 +64,12 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+
+  # Code generation
+  build_runner: ^2.4.13
+  json_serializable: ^6.8.0
+  riverpod_generator: ^2.6.2
+  freezed: ^2.5.7
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
