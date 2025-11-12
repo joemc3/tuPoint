@@ -12,7 +12,7 @@ Every feature must reinforce this hyper-local, ephemeral nature. Content lives a
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Foundation Complete → Domain Entities Complete → Repository Interfaces Complete → Use Cases Next
+**Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Next
 
 ### Phase 0-1: Database Foundation ✅ COMPLETE
 
@@ -61,11 +61,34 @@ The domain repository contracts are now defined:
 - ✅ **RLS-aware design** - Repository methods mirror database RLS policies
 - ✅ **Technology-agnostic** - No Supabase imports, pure Dart interfaces
 
-### Next Phase: Use Cases 🚧
+### Phase 3.3: Use Cases ✅ COMPLETE
 
-Ready to implement (Phase 3.3):
-- ❌ **Use cases** - DropPointUseCase, GetNearbyPointsUseCase, ToggleLikeUseCase, CreateProfileUseCase
-- ❌ **Data layer** - Supabase repository implementations, DTOs (Phase 4)
+🎉 **Domain Layer Complete!** The business logic layer is now fully implemented:
+
+**Profile Use Cases:**
+- ✅ **CreateProfileUseCase** - Create new user profile with username/bio validation (3-32 chars, alphanumeric + underscore/dash)
+- ✅ **FetchProfileUseCase** - Fetch profile by ID or username
+
+**Point Use Cases:**
+- ✅ **DropPointUseCase** - Create new Point with content validation (1-280 chars), Maidenhead normalization
+- ✅ **FetchNearbyPointsUseCase** - **CRITICAL MVP FEATURE** - Fetch points within 5km radius using HaversineCalculator, implements "content disappears when you leave the area", sorts by distance (nearest first)
+- ✅ **FetchUserPointsUseCase** - Get all active points by user, sorted by creation date (newest first)
+
+**Like Use Cases:**
+- ✅ **LikePointUseCase** - Record a like on a point (validates IDs before calling repository)
+- ✅ **UnlikePointUseCase** - Remove a like from a point (validates IDs before calling repository)
+- ✅ **GetLikeCountUseCase** - Get like count for a point
+
+**Supporting Infrastructure:**
+- ✅ **UseCase base class** - Abstract generic class for all use cases: `UseCase<Success, Request>`
+- ✅ **Request DTOs** - 8 strongly-typed request classes for all use cases (CreateProfileRequest, DropPointRequest, FetchNearbyPointsRequest, etc.)
+- ✅ **Validation-first pattern** - All inputs validated before repository calls
+- ✅ **Exception propagation** - Domain exceptions bubble up to presentation layer for proper error handling
+
+### Next Phase: Data Layer 🚧
+
+Ready to implement (Phase 4):
+- ❌ **Data layer** - Supabase repository implementations, DTOs, RLS-aware error handling
 - ❌ **State management** - Riverpod providers wiring it all together (Phase 5)
 - ❌ **Business logic integration** - Connect backend to UI mockups (Phase 6)
 
@@ -79,7 +102,7 @@ Ready to implement (Phase 3.3):
 - **Frontend**: Flutter (iOS, Android, Web)
 - **Backend**: Supabase (PostgreSQL 17 + PostGIS + Auth) ✅ *database running locally*
 - **State Management**: Riverpod ✅ *dependencies installed, not yet wired*
-- **Architecture**: Clean Architecture (3-layer) ✅ *UI complete, domain layer complete (utilities, entities, repository interfaces), use cases/data/state pending*
+- **Architecture**: Clean Architecture (3-layer) ✅ *UI complete, domain layer complete (utilities, entities, repository interfaces, use cases), data/state pending*
 - **Security**: Row Level Security (RLS) policies ✅ *12 policies enforced at database level*
 - **Geospatial**: PostGIS storage ✅ *schema ready*, client-side Haversine filtering ✅ *utilities implemented & tested*
 
@@ -135,13 +158,18 @@ See [CLAUDE.md](CLAUDE.md) for complete development guidance.
 │   │   ├── presentation/
 │   │   │   ├── screens/         # ✅ Auth, MainFeed, PointCreation (mockups)
 │   │   │   └── widgets/         # ✅ PointCard component
-│   │   ├── domain/              # 🚧 Domain layer (in progress)
+│   │   ├── domain/              # ✅ Domain layer (complete)
 │   │   │   ├── utils/           # ✅ Geospatial utilities (Maidenhead, Haversine, Distance)
 │   │   │   ├── value_objects/   # ✅ LocationCoordinate
 │   │   │   ├── entities/        # ✅ Profile, Point, Like entities with Freezed
 │   │   │   ├── exceptions/      # ✅ Domain exceptions (7 exception classes)
 │   │   │   ├── repositories/    # ✅ Repository interfaces (IPointsRepository, IProfileRepository, ILikesRepository)
-│   │   │   └── use_cases/       # ❌ Not yet implemented
+│   │   │   └── use_cases/       # ✅ 8 MVP use cases (Profile, Point, Like operations)
+│   │   │       ├── profile_use_cases/   # CreateProfileUseCase, FetchProfileUseCase
+│   │   │       ├── point_use_cases/     # DropPointUseCase, FetchNearbyPointsUseCase, FetchUserPointsUseCase
+│   │   │       ├── like_use_cases/      # LikePointUseCase, UnlikePointUseCase, GetLikeCountUseCase
+│   │   │       ├── requests.dart        # 8 request DTOs
+│   │   │       └── use_case_base.dart   # Abstract UseCase<Success, Request> base class
 │   │   └── data/                # ❌ Not yet implemented
 │   └── test/
 │       ├── widget_test.dart     # ✅ Basic widget test (1 test)
@@ -242,7 +270,7 @@ tuPoint's unique location system combines server-side precision with client-side
   - "1.2 km" for distances 1km and above
   - Implemented in `DistanceFormatter` utility with parsing support
 
-**Status**: All geospatial utilities are implemented and tested (91 passing tests). Domain entities with LocationCoordinate integration complete (49 passing tests). Repository interfaces defined with RLS-aware contracts. Ready for use case implementation.
+**Status**: All geospatial utilities are implemented and tested (91 passing tests). Domain entities with LocationCoordinate integration complete (49 passing tests). Repository interfaces defined with RLS-aware contracts. All MVP use cases implemented with comprehensive validation (8 use cases). Domain layer is complete. Ready for data layer implementation.
 
 ## Development Workflow
 

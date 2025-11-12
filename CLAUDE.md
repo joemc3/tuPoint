@@ -38,9 +38,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Foundation Complete → Domain Entities Complete → Repository Interfaces Complete → Use Cases Next
+**Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Next
 
-### Completed (Phase 0-3.2): ✅
+### Completed (Phase 0-3.3): ✅
 
 **Backend & Infrastructure:**
 - ✅ **Local Supabase Environment** - Docker containers running with PostgreSQL 17 + PostGIS
@@ -72,17 +72,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ **JSON Serialization** - Snake_case to camelCase mapping for all entities
 - ✅ **Entity Test Coverage** - 49 comprehensive tests for all entities (25 Profile, 16 Point, 8 Like)
 
-**Domain Layer Repository Interfaces (NEW - Phase 3.2):**
+**Domain Layer Repository Interfaces (Phase 3.2):**
 - ✅ **IPointsRepository** - Abstract contract for Point CRUD operations (6 methods)
 - ✅ **IProfileRepository** - Abstract contract for Profile operations (5 methods)
 - ✅ **ILikesRepository** - Abstract contract for Like operations (6 methods)
 - ✅ **Domain Exceptions** - 7 exception classes (UnauthorizedException, NotFoundException, ValidationException, etc.)
 - ✅ **RLS-Aware Design** - Repository methods mirror database RLS policies
 - ✅ **Technology-Agnostic** - No Supabase imports, pure Dart interfaces
+
+**Domain Layer Use Cases (NEW - Phase 3.3):**
+- ✅ **CreateProfileUseCase** - Profile creation with username validation
+- ✅ **FetchProfileUseCase** - Get user profile by ID
+- ✅ **DropPointUseCase** - Create Point with content validation (1-280 chars)
+- ✅ **FetchNearbyPointsUseCase** - 5km radius filtering with HaversineCalculator
+- ✅ **FetchUserPointsUseCase** - Get user's points sorted by date
+- ✅ **LikePointUseCase** - Like a point
+- ✅ **UnlikePointUseCase** - Unlike a point
+- ✅ **GetLikeCountUseCase** - Get like count for a point
+- ✅ **Request DTOs** - 8 strongly-typed request classes
 - ✅ **Total Test Coverage** - 141 passing tests (91 utils + 49 entities + 1 widget)
 
+**🎉 Domain Layer Complete!** All business logic, entities, repository contracts, and use cases implemented.
+
 ### Not Yet Implemented: ❌
-- ❌ **Domain Layer Use Cases** (business logic: DropPoint, ToggleLike, etc.)
 - ❌ **Data Layer** (Supabase repository implementations, DTOs)
 - ❌ **State Management** (Riverpod providers not yet integrated)
 - ❌ **Business Logic Wiring** (buttons skip to next screen, no data persistence)
@@ -90,7 +102,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ❌ **Real Authentication** (OAuth buttons navigate directly to feed)
 - ❌ **Location Services Integration** (GPS permission handling, real-time location)
 
-**Next Phase**: Use Cases (Phase 3.3), then Data Layer (Phase 4), then State Management (Phase 5)
+**Next Phase**: Data Layer (Phase 4 - Supabase implementations), then State Management (Phase 5 - Riverpod wiring)
 
 ## Project Structure
 
