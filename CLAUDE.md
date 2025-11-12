@@ -38,9 +38,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Foundation Complete → Domain Entities Complete → Repository Interfaces Next
+**Development Phase**: Database Setup Complete → Domain Layer Foundation Complete → Domain Entities Complete → Repository Interfaces Complete → Use Cases Next
 
-### Completed (Phase 0-3.1): ✅
+### Completed (Phase 0-3.2): ✅
 
 **Backend & Infrastructure:**
 - ✅ **Local Supabase Environment** - Docker containers running with PostgreSQL 17 + PostGIS
@@ -65,17 +65,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ **DistanceFormatter Utility** - Human-readable distance display
 - ✅ **Comprehensive Test Coverage** - 91 passing tests for all geospatial utilities
 
-**Domain Layer Entities (NEW - Phase 3.1):**
+**Domain Layer Entities (Phase 3.1):**
 - ✅ **Profile Entity** - Freezed immutable model with id, username, bio, timestamps
 - ✅ **Point Entity** - Freezed model with LocationCoordinate integration, PostGIS geometry converter
 - ✅ **Like Entity** - Freezed model representing composite key relationship
 - ✅ **JSON Serialization** - Snake_case to camelCase mapping for all entities
 - ✅ **Entity Test Coverage** - 49 comprehensive tests for all entities (25 Profile, 16 Point, 8 Like)
+
+**Domain Layer Repository Interfaces (NEW - Phase 3.2):**
+- ✅ **IPointsRepository** - Abstract contract for Point CRUD operations (6 methods)
+- ✅ **IProfileRepository** - Abstract contract for Profile operations (5 methods)
+- ✅ **ILikesRepository** - Abstract contract for Like operations (6 methods)
+- ✅ **Domain Exceptions** - 7 exception classes (UnauthorizedException, NotFoundException, ValidationException, etc.)
+- ✅ **RLS-Aware Design** - Repository methods mirror database RLS policies
+- ✅ **Technology-Agnostic** - No Supabase imports, pure Dart interfaces
 - ✅ **Total Test Coverage** - 141 passing tests (91 utils + 49 entities + 1 widget)
 
 ### Not Yet Implemented: ❌
-- ❌ **Domain Layer Repository Interfaces** (contracts for data access)
-- ❌ **Domain Layer Use Cases** (business logic)
+- ❌ **Domain Layer Use Cases** (business logic: DropPoint, ToggleLike, etc.)
 - ❌ **Data Layer** (Supabase repository implementations, DTOs)
 - ❌ **State Management** (Riverpod providers not yet integrated)
 - ❌ **Business Logic Wiring** (buttons skip to next screen, no data persistence)
@@ -83,7 +90,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ❌ **Real Authentication** (OAuth buttons navigate directly to feed)
 - ❌ **Location Services Integration** (GPS permission handling, real-time location)
 
-**Next Phase**: Repository Interfaces (Phase 3.2), then Use Cases (Phase 3.3), then Data Layer (Phase 4)
+**Next Phase**: Use Cases (Phase 3.3), then Data Layer (Phase 4), then State Management (Phase 5)
 
 ## Project Structure
 
@@ -110,7 +117,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   │   │   │   ├── profile.dart (+ .freezed.dart, .g.dart)
 │   │   │   │   ├── point.dart (+ .freezed.dart, .g.dart)
 │   │   │   │   └── like.dart (+ .freezed.dart, .g.dart)
-│   │   │   ├── repositories/    # (Not yet implemented)
+│   │   │   ├── exceptions/      # Domain exceptions ✅
+│   │   │   │   └── repository_exceptions.dart
+│   │   │   ├── repositories/    # Repository interfaces ✅
+│   │   │   │   ├── i_points_repository.dart
+│   │   │   │   ├── i_profile_repository.dart
+│   │   │   │   └── i_likes_repository.dart
 │   │   │   └── use_cases/       # (Not yet implemented)
 │   │   └── data/                # (Not yet implemented)
 │   └── test/
