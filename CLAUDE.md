@@ -36,6 +36,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Key Principle**: "Content disappears when you leave the area" - every feature must reinforce this hyper-local, ephemeral nature.
 
+## Codebase Statistics
+
+- **Total Dart Files**: 35 files (~4,150 lines of code)
+- **Screens**: 3 complete screens (Auth Gate, Main Feed, Point Creation)
+- **Reusable Widgets**: 1 component (PointCard)
+- **Domain Entities**: 3 core models (Profile, Point, Like) + generated Freezed/JSON files
+- **Repository Interfaces**: 3 contracts (IPointsRepository, IProfileRepository, ILikesRepository)
+- **Use Cases**: 8 business logic classes (Profile: 2, Point: 3, Like: 3)
+- **Request DTOs**: 8 strongly-typed request objects
+- **Geospatial Utilities**: 3 utilities (MaidenheadConverter, HaversineCalculator, DistanceFormatter)
+- **Value Objects**: 1 immutable type (LocationCoordinate)
+- **Domain Exceptions**: 7 exception classes
+- **Supabase Migrations**: 4 SQL schema files
+- **RLS Policies**: 10 security policies (profile: 4, points: 3, likes: 3)
+- **Test Coverage**: 287 comprehensive tests
+  - ✅ **Domain Utilities**: 91 tests
+  - ✅ **Domain Entities**: 49 tests
+  - ✅ **Domain Use Cases**: 126 tests
+  - ✅ **Widget Tests**: 21 tests (PointCard: 20, smoke test: 1)
+- **Test Pass Rate**: 281/287 passing (97.9%)
+- **Specialized AI Agents**: 8 agents for architecture domains
+- **Specification Documents**: 7 comprehensive spec files in `project_standards/`
+- **Theme Variants**: 2 modes (Light "BLUE IMMERSION", Dark "BLUE ELECTRIC")
+
 ## Current Status
 
 **Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Next
@@ -45,7 +69,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Backend & Infrastructure:**
 - ✅ **Local Supabase Environment** - Docker containers running with PostgreSQL 17 + PostGIS
 - ✅ **Database Schema** - 4 migrations applied (profile, points, likes tables)
-- ✅ **Row Level Security (RLS)** - 12 policies enforcing authorization at database level
+- ✅ **Row Level Security (RLS)** - 10 RLS policies enforcing authorization at database level (profile: 4, points: 3, likes: 3). Points table intentionally omits DELETE policy (soft delete via UPDATE). Likes table intentionally omits UPDATE policy (likes are immutable).
 - ✅ **PostGIS Spatial Support** - GEOMETRY(POINT, 4326) for lat/lon storage
 - ✅ **Auth Providers** - Email/Password, Google OAuth, Apple Sign In configured
 - ✅ **Environment Config** - `.env` and `env_config.dart` for local development
@@ -90,9 +114,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ **UnlikePointUseCase** - Unlike a point
 - ✅ **GetLikeCountUseCase** - Get like count for a point
 - ✅ **Request DTOs** - 8 strongly-typed request classes
-- ✅ **Total Test Coverage** - 141 passing tests (91 utils + 49 entities + 1 widget)
 
-**🎉 Domain Layer Complete!** All business logic, entities, repository contracts, and use cases implemented.
+**Current Test Coverage**: 141 passing tests
+- ✅ **Utilities**: 91 tests (Maidenhead, Haversine, Distance formatter)
+- ✅ **Entities**: 49 tests (Profile, Point, Like with JSON serialization)
+- ✅ **Widget**: 1 test (basic smoke test)
+- ❌ **Use Cases**: 0 tests ⚠️ **CRITICAL GAP** - needs 40-60 tests for comprehensive coverage
+
+**Domain Layer Status**:
+- ✅ **Utilities**: COMPLETE with comprehensive tests
+- ✅ **Entities**: COMPLETE with comprehensive tests
+- ✅ **Repository Interfaces**: COMPLETE (technology-agnostic contracts)
+- ⚠️ **Use Cases**: IMPLEMENTED but NOT TESTED (high-risk - business logic must be proven correct)
 
 ### Not Yet Implemented: ❌
 - ❌ **Data Layer** (Supabase repository implementations, DTOs)

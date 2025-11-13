@@ -20,7 +20,7 @@ This document compiles the **Data Model, Relationships, and RLS Policies** for t
 | Field Name | Data Type | Constraints / Description |
 | :--- | :--- | :--- |
 | **`id`** | `uuid` | **Primary Key** & **Foreign Key** to `auth.users.id`. **NOT NULL** |
-| **`username`** | `text` | **NOT NULL**. **Unique**. |
+| **`username`** | `text` | **NOT NULL**. **Unique**. Length: 3-30 characters. Format: Alphanumeric + underscore only (`^[a-zA-Z0-9_]+$`). |
 | **`bio`** | `text` | **NULLABLE**. |
 | **`created_at`** | `timestamptz` | **NOT NULL** (Default: `now()`). |
 | **`updated_at`** | `timestamptz` | **NULLABLE**. |
