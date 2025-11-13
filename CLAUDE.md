@@ -38,13 +38,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Codebase Statistics
 
-- **Total Dart Files**: 42 files (~6,491 lines of code)
+- **Total Dart Files**: 48 files (~7,844 lines of code)
 - **Screens**: 3 complete screens (Auth Gate, Main Feed, Point Creation)
 - **Reusable Widgets**: 1 component (PointCard)
-- **Domain Entities**: 4 core models (Profile, Point, Like, AuthState) + generated Freezed/JSON files
+- **Domain Entities**: 6 core models (Profile, Point, Like, AuthState, LocationPermissionState, LocationServiceState) + generated Freezed/JSON files
 - **Repository Interfaces**: 3 contracts (IPointsRepository, IProfileRepository, ILikesRepository)
 - **Repository Implementations**: 3 Supabase implementations (~915 lines)
-- **Riverpod Providers**: 10 providers (Supabase client + 3 repositories + 6 auth providers)
+- **Core Services**: 1 (LocationService for GPS and permissions - 318 lines)
+- **Riverpod Providers**: 16 providers (Supabase + 3 repositories + 6 auth + 6 location)
 - **State Notifiers**: 1 (AuthNotifier for authentication state management)
 - **Use Cases**: 8 business logic classes (Profile: 2, Point: 3, Like: 3)
 - **Request DTOs**: 8 strongly-typed request objects
@@ -53,13 +54,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Domain Exceptions**: 7 exception classes
 - **Supabase Migrations**: 4 SQL schema files
 - **RLS Policies**: 10 security policies (profile: 4, points: 3, likes: 3)
-- **Test Coverage**: 345 comprehensive tests (~2,900 lines)
+- **Test Coverage**: 369 comprehensive tests (~3,245 lines)
   - ✅ **Domain Utilities**: 91 tests
-  - ✅ **Domain Entities**: 49 tests
+  - ✅ **Domain Entities**: 73 tests (Profile: 25, Point: 16, Like: 8, LocationPermissionState: 9, LocationServiceState: 15)
   - ✅ **Domain Use Cases**: 126 tests
   - ✅ **Widget Tests**: 21 tests (PointCard: 20, smoke test: 1)
   - ✅ **Integration Tests**: 58 tests (repository implementations with real database)
-- **Test Pass Rate**: 331/345 passing (96.0%)
+- **Test Pass Rate**: 355/369 passing (96.2%)
 - **Specialized AI Agents**: 8 agents for architecture domains
 - **Specification Documents**: 7 comprehensive spec files in `project_standards/`
 - **Theme Variants**: 2 modes (Light "BLUE IMMERSION", Dark "BLUE ELECTRIC")
@@ -182,16 +183,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - `fetchProfileUseCaseProvider` - Profile fetching use case
 - ✅ **Documentation** - Comprehensive usage guide and architecture diagrams
 
-**Next Steps (Phase 5.3+):**
-- ❌ **Location Services** (GPS permission handling, StreamProvider for real-time location)
-- ❌ **Profile State Management** (ProfileNotifier, profile creation/update flows)
-- ❌ **Point Creation State** (DropPointNotifier, point creation flow)
-- ❌ **Feed State** (FetchNearbyPointsUseCase with 5km filtering)
-- ❌ **Like/Unlike State** (LikeNotifier, toggle functionality)
-- ❌ **Business Logic Wiring** (connect state to UI)
-- ❌ **Loading/Error States** (comprehensive error handling throughout UI)
+**Location Services (Phase 5.3): ✅ COMPLETE**
+- ✅ **LocationPermissionState Model** - Freezed union type (notAsked, granted, denied, deniedForever, serviceDisabled)
+- ✅ **LocationServiceState Model** - Freezed union type (loading, available, permissionDenied, serviceDisabled, error)
+- ✅ **LocationService Class** - GPS and permission handling service (318 lines)
+  - Check and request location permissions
+  - One-time location fetch (getCurrentLocation)
+  - Real-time location stream (getLocationStream)
+  - Platform settings access (openLocationSettings, openAppSettings)
+  - High accuracy GPS with 10m distance filter
+- ✅ **Location Providers** - 6 Riverpod providers in `location_providers.dart` (217 lines):
+  - `locationServiceProvider` - LocationService instance
+  - `locationPermissionProvider` - Current permission state
+  - `currentLocationProvider` - One-time location fetch
+  - `locationStreamProvider` - Real-time location stream
+  - `hasLocationPermissionProvider` - Boolean permission check
+  - `locationServicesEnabledProvider` - GPS enabled check
+- ✅ **Platform Configuration** - iOS Info.plist and Android AndroidManifest.xml updated
+- ✅ **Test Coverage** - 24 tests for location state models (100% pass rate)
+- ✅ **Documentation** - 3 comprehensive guides (README, Quick Start, Summary)
 
-**Current Phase**: Authentication Complete → Location Services Next
+**Next Steps (Phase 5.4+):**
+- ❌ **Profile State Management** (ProfileNotifier, profile creation/update flows)
+- ❌ **Point Creation State** (DropPointNotifier with location integration)
+- ❌ **Feed State** (FetchNearbyPointsUseCase with 5km filtering using location stream)
+- ❌ **Like/Unlike State** (LikeNotifier, toggle functionality)
+- ❌ **Business Logic Wiring** (connect state to UI screens)
+- ❌ **UI Integration** (wire location, auth, and data providers to screens)
+
+**Current Phase**: Location Services Complete → Profile/Point State Management Next
 
 ## Project Structure
 
@@ -205,7 +225,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   │   │   ├── constants/       # App-wide constants (spacing, sizes, colors)
 │   │   │   ├── providers/       # Riverpod providers ✅
 │   │   │   │   ├── repository_providers.dart    # Repository providers (4 providers)
-│   │   │   │   └── auth_providers.dart          # Authentication providers (6 providers)
+│   │   │   │   ├── auth_providers.dart          # Authentication providers (6 providers)
+│   │   │   │   └── location_providers.dart      # Location providers (6 providers)
+│   │   │   ├── services/        # Core services ✅
+│   │   │   │   ├── location_service.dart        # GPS and permission service (318 lines)
+│   │   │   │   └── LOCATION_SERVICES_README.md  # Location services documentation
 │   │   │   └── theme/           # Material 3 theme v3.0 (BLUE DOMINANCE)
 │   │   ├── presentation/
 │   │   │   ├── notifiers/       # State management notifiers ✅
@@ -224,7 +248,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   │   │   │   ├── profile.dart (+ .freezed.dart, .g.dart)
 │   │   │   │   ├── point.dart (+ .freezed.dart, .g.dart)
 │   │   │   │   ├── like.dart (+ .freezed.dart, .g.dart)
-│   │   │   │   └── auth_state.dart (+ .freezed.dart)    # Authentication state model
+│   │   │   │   ├── auth_state.dart (+ .freezed.dart)                   # Authentication state model
+│   │   │   │   ├── location_permission_state.dart (+ .freezed.dart)    # Location permission states
+│   │   │   │   └── location_service_state.dart (+ .freezed.dart)       # Location service states
 │   │   │   ├── exceptions/      # Domain exceptions ✅
 │   │   │   │   └── repository_exceptions.dart
 │   │   │   ├── repositories/    # Repository interfaces ✅
@@ -250,7 +276,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │       │   └── point_card_test.dart    # PointCard component tests (20 tests)
 │       ├── domain/              # Domain layer tests ✅
 │       │   ├── utils/           # Geospatial utility tests (91 tests)
-│       │   ├── entities/        # Entity tests (49 tests)
+│       │   ├── entities/        # Entity tests (73 tests: Profile, Point, Like, LocationPermissionState, LocationServiceState)
 │       │   └── use_cases/       # Use case tests (126 tests)
 │       │       ├── profile_use_cases/
 │       │       ├── point_use_cases/
