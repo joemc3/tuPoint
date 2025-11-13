@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'core/config/env_config.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/screens/auth_gate_screen.dart';
 
@@ -6,22 +9,38 @@ import 'presentation/screens/auth_gate_screen.dart';
 ///
 /// Main entry point for the tuPoint Flutter application.
 ///
-/// This is a UI mockup implementation with hardcoded test data for visual
-/// demonstration purposes. No business logic, state management, or API
-/// integration is implemented.
+/// Architecture:
+/// - Clean Architecture (Presentation → Domain → Data layers)
+/// - Riverpod for state management
+/// - Supabase for backend (Auth, Database, RLS)
 ///
-/// Key Features (Mockup):
+/// Key Features:
 /// - Material 3 design with Location Blue (#3A9BFC) theme
 /// - Inter typography for modern, readable UI
-/// - Three navigable screens:
-///   1. Authentication Gate (welcome screen)
-///   2. Main Feed (Point cards with test data)
-///   3. Point Creation (form with mock location)
+/// - Three main screens: Authentication → Main Feed → Point Creation
+/// - PostGIS-powered geospatial features
+/// - Client-side 5km radius filtering
 ///
 /// Theme specifications: /project_standards/project-theme.md
 /// UX specifications: /project_standards/UX_user_flow.md
-void main() {
-  runApp(const TuPointApp());
+/// Architecture: /project_standards/architecture_and_state_management.md
+Future<void> main() async {
+  // Ensure Flutter bindings are initialized
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Supabase
+  await Supabase.initialize(
+    url: EnvConfig.supabaseUrl,
+    anonKey: EnvConfig.supabaseAnonKey,
+    debug: true, // Enable debug logging for development
+  );
+
+  // Run app wrapped in ProviderScope for Riverpod
+  runApp(
+    const ProviderScope(
+      child: TuPointApp(),
+    ),
+  );
 }
 
 /// Root application widget
