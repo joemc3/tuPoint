@@ -62,7 +62,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - ✅ **Integration Tests**: 58 tests (repository implementations with real database)
 - **Test Pass Rate**: 355/369 passing (96.2%)
 - **Specialized AI Agents**: 8 agents for architecture domains
-- **Specification Documents**: 7 comprehensive spec files in `project_standards/`
+- **Specification Documents**: 8 comprehensive spec files in `project_standards/` (including AUTH_ARCHITECTURE.md)
 - **Theme Variants**: 2 modes (Light "BLUE IMMERSION", Dark "BLUE ELECTRIC")
 
 ## Current Status
@@ -296,6 +296,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ├── project_standards/            # Detailed specifications (source of truth)
 │   ├── architecture_and_state_management.md
 │   ├── api_strategy.md
+│   ├── AUTH_ARCHITECTURE.md     # Authentication architecture diagrams and flows
 │   ├── product_requirements_document(PRD).md
 │   ├── tuPoint_data_schema.md
 │   ├── UX_user_flow.md

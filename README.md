@@ -46,7 +46,7 @@ Every feature must reinforce this hyper-local, ephemeral nature. Content lives a
   - ✅ Domain Use Cases: 126 tests
   - ✅ Widget Tests: 21 tests
   - ✅ Integration Tests: 58 tests (real database)
-- **Documentation**: 7 specification documents + comprehensive AI agent system
+- **Documentation**: 8 specification documents in project_standards/ + comprehensive AI agent system
 - **Theme**: 2 polished variants (Light "BLUE IMMERSION", Dark "BLUE ELECTRIC")
 
 ### Phase 0-1: Database Foundation ✅ COMPLETE
