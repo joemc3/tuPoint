@@ -17,17 +17,34 @@ class AuthGateScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isLight = theme.brightness == Brightness.light;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(AppConstants.spacingMD),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
+      // v3.0 BLUE DOMINANCE: Bold gradient background
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: isLight
+                ? [
+                    const Color(0xFFB3DCFF), // Top - SATURATED blue
+                    const Color(0xFFD6EEFF), // Bottom - OBVIOUS blue
+                  ]
+                : [
+                    const Color(0xFF0F1A26), // Top - dark blue
+                    const Color(0xFF1A2836), // Bottom - lighter blue
+                  ],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(AppConstants.spacingMD),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
                 // App branding section
                 Text(
                   'tuPoint',
@@ -93,12 +110,13 @@ class AuthGateScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+                ],
+              ), // End of Column
+            ), // End of Padding
+          ), // End of Center
+        ), // End of SafeArea
+      ), // End of Container
+    ); // End of Scaffold
   }
 
   /// Navigate to Main Feed screen

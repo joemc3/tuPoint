@@ -34,3 +34,10 @@ The MVP will focus on the core loop: **Authenticate -> Drop a Point -> View Near
 | **Security** | All client-to-server interaction must use **JWT validation** and be governed by **RLS policies**. | Mandatory for any social application MVP. |
 | **Scalability** | Initial schema must support a growth path towards complex graph queries and real-time features (via Supabase Realtime). | Ensure the core data model (e.g., PostGIS, normalized tables) supports future needs. |
 
+### 4. User Profile Requirements
+
+| Field | Validation Rules | Rationale |
+| :--- | :--- | :--- |
+| **Username** | **Length:** 3-30 characters<br>**Format:** Alphanumeric characters (a-z, A-Z, 0-9) and underscore (_) only<br>**Regex:** `^[a-zA-Z0-9_]+$`<br>**Uniqueness:** Must be unique across all users | Keep usernames readable, prevent special characters that could cause display issues, ensure reasonable length for UI constraints. Dashes excluded to simplify validation and avoid confusion with similar-looking characters. |
+| **Bio** | **Length:** 0-280 characters<br>**Format:** Free text (all Unicode characters allowed)<br>**Optional:** Can be null/empty | Allow users to express themselves briefly. Same length limit as Point content for consistency. |
+

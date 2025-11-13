@@ -105,7 +105,7 @@ class AppTheme {
   }
 
   // ============================================================================
-  // DARK THEME - "Blue Glow"
+  // DARK THEME - "BLUE ELECTRIC"
   // ============================================================================
 
   static ThemeData get darkTheme {
@@ -226,6 +226,14 @@ class AppTheme {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppConstants.borderRadiusDefault),
         ),
+        // v3.0: Even UNFOCUSED inputs have visible blue borders!
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppConstants.borderRadiusDefault),
+          borderSide: BorderSide(
+            color: colorScheme.primary.withValues(alpha: isLight ? 0.4 : 0.5),
+            width: 1.5,
+          ),
+        ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppConstants.borderRadiusDefault),
           borderSide: BorderSide(
@@ -273,13 +281,30 @@ class AppTheme {
       // ========================================================================
       // APP BAR THEME
       // ========================================================================
+      // NOTE: v3.0 specifies AppBar gradient (Location Blue → Lighter Blue)
+      // This must be applied in individual AppBar widgets using flexibleSpace:
+      //   AppBar(
+      //     flexibleSpace: Container(
+      //       decoration: BoxDecoration(
+      //         gradient: LinearGradient(
+      //           begin: Alignment.centerLeft,
+      //           end: Alignment.centerRight,
+      //           colors: [Color(0xFF3A9BFC), Color(0xFF5AB0FF)],
+      //         ),
+      //       ),
+      //     ),
+      //   )
       appBarTheme: AppBarTheme(
         centerTitle: false,
         elevation: 0,
+        backgroundColor: colorScheme.primary, // Fallback for AppBars without gradient
         titleTextStyle: GoogleFonts.inter(
           fontSize: 20.0,
           fontWeight: FontWeight.w600,
-          color: colorScheme.onSurface,
+          color: colorScheme.onPrimary, // White text on blue background
+        ),
+        iconTheme: IconThemeData(
+          color: colorScheme.onPrimary, // White icons on blue background
         ),
       ),
     );
