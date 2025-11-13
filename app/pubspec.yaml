@@ -67,6 +67,7 @@ dev_dependencies:
 
   # Testing
   mocktail: ^1.0.0
+  shared_preferences: ^2.3.5
 
   # Code generation
   build_runner: ^2.4.13
