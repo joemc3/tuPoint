@@ -38,12 +38,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Codebase Statistics
 
-- **Total Dart Files**: 38 files (~5,700 lines of code)
+- **Total Dart Files**: 39 files (~5,770 lines of code)
 - **Screens**: 3 complete screens (Auth Gate, Main Feed, Point Creation)
 - **Reusable Widgets**: 1 component (PointCard)
 - **Domain Entities**: 3 core models (Profile, Point, Like) + generated Freezed/JSON files
 - **Repository Interfaces**: 3 contracts (IPointsRepository, IProfileRepository, ILikesRepository)
 - **Repository Implementations**: 3 Supabase implementations (~915 lines)
+- **Riverpod Providers**: 4 core providers (Supabase client + 3 repository providers)
 - **Use Cases**: 8 business logic classes (Profile: 2, Point: 3, Like: 3)
 - **Request DTOs**: 8 strongly-typed request objects
 - **Geospatial Utilities**: 3 utilities (MaidenheadConverter, HaversineCalculator, DistanceFormatter)
@@ -152,14 +153,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ Widget Tests: 21 tests
 - ✅ Integration Tests: 58 tests (real database)
 
-### Not Yet Implemented: ❌
-- ❌ **State Management** (Riverpod providers not yet integrated)
-- ❌ **Business Logic Wiring** (buttons skip to next screen, no data persistence)
-- ❌ **API Integration** (Supabase client not wired to UI)
-- ❌ **Real Authentication** (OAuth buttons navigate directly to feed)
-- ❌ **Location Services Integration** (GPS permission handling, real-time location)
+**State Management Layer (Phase 5.1): 🔄 IN PROGRESS**
 
-**Next Phase**: State Management (Phase 5 - Riverpod wiring)
+**Repository Providers (Phase 5.1):**
+- ✅ **Supabase Initialization** - App-wide Supabase client initialization in main.dart
+- ✅ **ProviderScope Setup** - Riverpod enabled for entire app
+- ✅ **Repository Providers** - Core infrastructure providers:
+  - `supabaseClientProvider` - Singleton Supabase client access
+  - `profileRepositoryProvider` - IProfileRepository implementation
+  - `pointsRepositoryProvider` - IPointsRepository implementation
+  - `likesRepositoryProvider` - ILikesRepository implementation
+
+**Next Steps (Phase 5.2+):**
+- ❌ **Authentication State** (AuthNotifier, authProvider)
+- ❌ **Location Services** (GPS permission handling, StreamProvider for real-time location)
+- ❌ **Profile State Management** (ProfileNotifier, profile creation flow)
+- ❌ **Point Creation State** (DropPointNotifier, point creation flow)
+- ❌ **Feed State** (FetchNearbyPointsUseCase with 5km filtering)
+- ❌ **Like/Unlike State** (LikeNotifier, toggle functionality)
+- ❌ **Business Logic Wiring** (connect state to UI)
+- ❌ **Loading/Error States** (comprehensive error handling throughout UI)
+
+**Current Phase**: State Management Infrastructure → Authentication Next
 
 ## Project Structure
 
@@ -171,6 +186,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   │   ├── core/
 │   │   │   ├── config/          # Environment configuration
 │   │   │   ├── constants/       # App-wide constants (spacing, sizes, colors)
+│   │   │   ├── providers/       # Riverpod providers ✅
+│   │   │   │   └── repository_providers.dart    # Repository providers
 │   │   │   └── theme/           # Material 3 theme v3.0 (BLUE DOMINANCE)
 │   │   ├── presentation/
 │   │   │   ├── screens/         # Auth, MainFeed, PointCreation screens
