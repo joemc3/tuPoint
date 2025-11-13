@@ -12,15 +12,15 @@ Every feature must reinforce this hyper-local, ephemeral nature. Content lives a
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Complete → **Data Layer Complete** → State Management Next
+**Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Complete → **State Management In Progress** (Auth + Location Complete → Profile/Point State Next)
 
 ## Codebase Statistics
 
-- **Total Dart Files**: 38 files (~5,700 lines of code)
+- **Total Dart Files**: 62 files (~13,000 lines of code, excluding generated files)
 - **Screens**: 3 complete screens (Auth Gate, Main Feed, Point Creation)
 - **Reusable Widgets**: 1 component (PointCard - fully tested)
 - **Domain Layer**: 100% complete
-  - **Entities**: 3 core models (Profile, Point, Like) with Freezed immutability
+  - **Entities**: 6 core models (Profile, Point, Like, AuthState, LocationPermissionState, LocationServiceState) with Freezed immutability
   - **Repository Interfaces**: 3 contracts (IPointsRepository, IProfileRepository, ILikesRepository)
   - **Use Cases**: 8 business logic classes
   - **Geospatial Utilities**: 3 utilities (Maidenhead, Haversine, Distance)
@@ -31,12 +31,18 @@ Every feature must reinforce this hyper-local, ephemeral nature. Content lives a
   - **RLS-Aware**: Defensive checks mirror database policies
   - **PostGIS Integration**: WKT/GeoJSON geometry handling
   - **Error Mapping**: PostgrestException → domain exceptions
+- **State Management Layer**: In progress (auth + location complete)
+  - **Riverpod Providers**: 16 providers (Supabase + 3 repositories + 6 auth + 6 location)
+  - **Core Services**: 1 (LocationService - 318 lines)
+  - **State Notifiers**: 1 (AuthNotifier - 346 lines)
+  - **Authentication**: Email/password, Google OAuth, Apple Sign In support
+  - **Location Services**: GPS permissions, one-time fetch, real-time streaming
 - **Database**:
   - **Migrations**: 4 SQL schema files
   - **RLS Policies**: 10 security policies
-- **Test Coverage**: 345 comprehensive tests (96.0% pass rate)
+- **Test Coverage**: 369 comprehensive tests (96.2% pass rate)
   - ✅ Domain Utilities: 91 tests
-  - ✅ Domain Entities: 49 tests
+  - ✅ Domain Entities: 73 tests (Profile, Point, Like, LocationPermissionState, LocationServiceState)
   - ✅ Domain Use Cases: 126 tests
   - ✅ Widget Tests: 21 tests
   - ✅ Integration Tests: 58 tests (real database)
@@ -146,24 +152,89 @@ The domain repository contracts are now defined:
 
 **Data layer is now complete and ready for state management wiring.**
 
-### Next Phase: State Management 🚧
+### Phase 5.1: Repository Providers ✅ COMPLETE
 
-Ready to implement (Phase 5):
-- ❌ **State management** - Riverpod providers wiring repositories to UI
-- ❌ **Business logic integration** - Connect backend to UI mockups (Phase 6)
-- ❌ **Real authentication** - Wire OAuth and email/password flows
+**Riverpod Infrastructure Setup (2025-11-13):**
+- ✅ **Supabase initialization** - App-wide Supabase client setup in main.dart
+- ✅ **ProviderScope** - Riverpod enabled for entire app
+- ✅ **Repository providers** - 4 core infrastructure providers:
+  - `supabaseClientProvider` - Singleton Supabase client access
+  - `profileRepositoryProvider` - IProfileRepository implementation
+  - `pointsRepositoryProvider` - IPointsRepository implementation
+  - `likesRepositoryProvider` - ILikesRepository implementation
+
+**Repository providers are ready for state notifier consumption.**
+
+### Phase 5.2: Authentication State ✅ COMPLETE
+
+**Authentication State Management (2025-11-13):**
+- ✅ **AuthState model** - Freezed union type (Unauthenticated, Authenticated, Loading, Error) with profile completion tracking
+- ✅ **AuthNotifier** - StateNotifier managing all auth operations (346 lines):
+  - Email/password sign in and sign up
+  - Google OAuth and Apple Sign In support
+  - Automatic profile creation during signup
+  - Session persistence via Supabase auth state stream
+  - User-friendly error mapping (AuthException → readable messages)
+- ✅ **Auth providers** - 6 Riverpod providers in `auth_providers.dart` (131 lines):
+  - `authNotifierProvider` - Main authentication state notifier
+  - `authStateProvider` - Convenience provider for current state
+  - `currentUserIdProvider` - Extracts userId when authenticated
+  - `hasProfileProvider` - Checks profile completion status
+  - `createProfileUseCaseProvider` - Profile creation use case
+  - `fetchProfileUseCaseProvider` - Profile fetching use case
+- ✅ **Documentation** - Comprehensive usage guide (README.md) and architecture diagrams (AUTH_ARCHITECTURE.md)
+- ✅ **Clean architecture** - Uses domain layer use cases, maintains proper separation
+
+**Authentication foundation is complete with 721 lines of production code.**
+
+### Phase 5.3: Location Services ✅ COMPLETE
+
+**Location Services State Management (2025-11-13):**
+- ✅ **LocationPermissionState model** - Freezed union type (notAsked, granted, denied, deniedForever, serviceDisabled)
+- ✅ **LocationServiceState model** - Freezed union type (loading, available, permissionDenied, serviceDisabled, error)
+- ✅ **LocationService class** - GPS and permission handling service (318 lines):
+  - Check and request location permissions
+  - One-time location fetch with 15s timeout
+  - Real-time location stream with 10m distance filter
+  - Platform settings access (openLocationSettings, openAppSettings)
+  - High accuracy GPS positioning
+  - Comprehensive error handling
+- ✅ **Location providers** - 6 Riverpod providers in `location_providers.dart` (217 lines):
+  - `locationServiceProvider` - LocationService instance
+  - `locationPermissionProvider` - Current permission state
+  - `currentLocationProvider` - FutureProvider for one-time location
+  - `locationStreamProvider` - StreamProvider for real-time updates
+  - `hasLocationPermissionProvider` - Boolean permission check
+  - `locationServicesEnabledProvider` - GPS enabled check
+- ✅ **Platform configuration** - iOS Info.plist and Android AndroidManifest.xml updated with location permissions
+- ✅ **Test coverage** - 24 comprehensive tests for location state models (100% pass rate)
+- ✅ **Documentation** - 3 comprehensive guides (LOCATION_SERVICES_README.md, LOCATION_QUICK_START.md, PHASE_5.3_LOCATION_SERVICES_SUMMARY.md)
+- ✅ **Domain integration** - Returns LocationCoordinate value objects from domain layer
+
+**Location services foundation is complete with 853 lines of production code (service + providers + state models).**
+
+### Next Phase: Profile/Point State & UI Wiring 🚧
+
+Ready to implement (Phase 5.4+):
+- ❌ **Profile State Management** - ProfileNotifier for profile creation/update flows
+- ❌ **Point Creation State** - DropPointNotifier integrating with LocationService
+- ❌ **Feed State** - Combine locationStreamProvider + FetchNearbyPointsUseCase for 5km filtering
+- ❌ **Like/Unlike State** - LikeNotifier with optimistic updates
+- ❌ **Business logic wiring** - Connect state notifiers to use cases
+- ❌ **UI Integration** - Wire providers into Auth Gate, Main Feed, Point Creation screens
+- ❌ **Permission flows** - Add location permission request UI
 
 **Quick Start:**
 - Run `flutter run` in the `app/` directory to see the UI mockup
-- Run `flutter test` to run all 345 tests (91 utils + 49 entities + 126 use cases + 21 widgets + 58 integration)
+- Run `flutter test` to run all 369 tests (91 utils + 73 entities + 126 use cases + 21 widgets + 58 integration)
 - Run `supabase start` to launch the local database environment
 
 ## Tech Stack
 
 - **Frontend**: Flutter (iOS, Android, Web)
 - **Backend**: Supabase (PostgreSQL 17 + PostGIS + Auth) ✅ *database running locally*
-- **State Management**: Riverpod ✅ *dependencies installed, not yet wired*
-- **Architecture**: Clean Architecture (3-layer) ✅ *UI complete, domain layer complete (utilities, entities, repository interfaces, use cases), data/state pending*
+- **State Management**: Riverpod ✅ *providers wired, authentication state complete*
+- **Architecture**: Clean Architecture (3-layer) ✅ *UI complete, domain layer complete, data layer complete, state management in progress*
 - **Security**: Row Level Security (RLS) policies ✅ *10 policies enforced at database level*
 - **Geospatial**: PostGIS storage ✅ *schema ready*, client-side Haversine filtering ✅ *utilities implemented & tested*
 

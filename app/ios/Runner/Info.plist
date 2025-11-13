@@ -45,5 +45,12 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Location permissions for tuPoint -->
+	<!-- Required: Explains why the app needs location access -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>tuPoint needs your location to show nearby Points within 5km and to create new Points at your current location. Your exact location is never shared publicly - only an approximate area is shown.</string>
+	<!-- Optional: For background location if needed in future -->
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>tuPoint needs your location to show nearby Points and create new Points. Your exact location is never shared publicly.</string>
 </dict>
 </plist>
