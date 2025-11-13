@@ -12,15 +12,15 @@ Every feature must reinforce this hyper-local, ephemeral nature. Content lives a
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Complete → **Data Layer Complete** → State Management Next
+**Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Complete → **State Management In Progress** (Auth Complete → Location Services Next)
 
 ## Codebase Statistics
 
-- **Total Dart Files**: 38 files (~5,700 lines of code)
+- **Total Dart Files**: 42 files (~6,491 lines of code)
 - **Screens**: 3 complete screens (Auth Gate, Main Feed, Point Creation)
 - **Reusable Widgets**: 1 component (PointCard - fully tested)
 - **Domain Layer**: 100% complete
-  - **Entities**: 3 core models (Profile, Point, Like) with Freezed immutability
+  - **Entities**: 4 core models (Profile, Point, Like, AuthState) with Freezed immutability
   - **Repository Interfaces**: 3 contracts (IPointsRepository, IProfileRepository, ILikesRepository)
   - **Use Cases**: 8 business logic classes
   - **Geospatial Utilities**: 3 utilities (Maidenhead, Haversine, Distance)
@@ -31,6 +31,10 @@ Every feature must reinforce this hyper-local, ephemeral nature. Content lives a
   - **RLS-Aware**: Defensive checks mirror database policies
   - **PostGIS Integration**: WKT/GeoJSON geometry handling
   - **Error Mapping**: PostgrestException → domain exceptions
+- **State Management Layer**: In progress (auth complete)
+  - **Riverpod Providers**: 10 providers (Supabase client + 3 repositories + 6 auth providers)
+  - **State Notifiers**: 1 (AuthNotifier - 346 lines)
+  - **Authentication**: Email/password, Google OAuth, Apple Sign In support
 - **Database**:
   - **Migrations**: 4 SQL schema files
   - **RLS Policies**: 10 security policies
@@ -146,12 +150,51 @@ The domain repository contracts are now defined:
 
 **Data layer is now complete and ready for state management wiring.**
 
-### Next Phase: State Management 🚧
+### Phase 5.1: Repository Providers ✅ COMPLETE
 
-Ready to implement (Phase 5):
-- ❌ **State management** - Riverpod providers wiring repositories to UI
-- ❌ **Business logic integration** - Connect backend to UI mockups (Phase 6)
-- ❌ **Real authentication** - Wire OAuth and email/password flows
+**Riverpod Infrastructure Setup (2025-11-13):**
+- ✅ **Supabase initialization** - App-wide Supabase client setup in main.dart
+- ✅ **ProviderScope** - Riverpod enabled for entire app
+- ✅ **Repository providers** - 4 core infrastructure providers:
+  - `supabaseClientProvider` - Singleton Supabase client access
+  - `profileRepositoryProvider` - IProfileRepository implementation
+  - `pointsRepositoryProvider` - IPointsRepository implementation
+  - `likesRepositoryProvider` - ILikesRepository implementation
+
+**Repository providers are ready for state notifier consumption.**
+
+### Phase 5.2: Authentication State ✅ COMPLETE
+
+**Authentication State Management (2025-11-13):**
+- ✅ **AuthState model** - Freezed union type (Unauthenticated, Authenticated, Loading, Error) with profile completion tracking
+- ✅ **AuthNotifier** - StateNotifier managing all auth operations (346 lines):
+  - Email/password sign in and sign up
+  - Google OAuth and Apple Sign In support
+  - Automatic profile creation during signup
+  - Session persistence via Supabase auth state stream
+  - User-friendly error mapping (AuthException → readable messages)
+- ✅ **Auth providers** - 6 Riverpod providers in `auth_providers.dart` (131 lines):
+  - `authNotifierProvider` - Main authentication state notifier
+  - `authStateProvider` - Convenience provider for current state
+  - `currentUserIdProvider` - Extracts userId when authenticated
+  - `hasProfileProvider` - Checks profile completion status
+  - `createProfileUseCaseProvider` - Profile creation use case
+  - `fetchProfileUseCaseProvider` - Profile fetching use case
+- ✅ **Documentation** - Comprehensive usage guide (README.md) and architecture diagrams (AUTH_ARCHITECTURE.md)
+- ✅ **Clean architecture** - Uses domain layer use cases, maintains proper separation
+
+**Authentication foundation is complete with 721 lines of production code.**
+
+### Next Phase: Location Services & More State 🚧
+
+Ready to implement (Phase 5.3+):
+- ❌ **Location Services** - GPS permission handling, StreamProvider for real-time location
+- ❌ **Profile State Management** - ProfileNotifier for profile creation/update flows
+- ❌ **Point Creation State** - DropPointNotifier for point creation flow
+- ❌ **Feed State** - FetchNearbyPointsUseCase with 5km radius filtering
+- ❌ **Like/Unlike State** - LikeNotifier with toggle functionality
+- ❌ **Business logic wiring** - Connect state to UI screens
+- ❌ **UI Integration** - Wire providers into Auth Gate, Main Feed, Point Creation screens
 
 **Quick Start:**
 - Run `flutter run` in the `app/` directory to see the UI mockup
@@ -162,8 +205,8 @@ Ready to implement (Phase 5):
 
 - **Frontend**: Flutter (iOS, Android, Web)
 - **Backend**: Supabase (PostgreSQL 17 + PostGIS + Auth) ✅ *database running locally*
-- **State Management**: Riverpod ✅ *dependencies installed, not yet wired*
-- **Architecture**: Clean Architecture (3-layer) ✅ *UI complete, domain layer complete (utilities, entities, repository interfaces, use cases), data/state pending*
+- **State Management**: Riverpod ✅ *providers wired, authentication state complete*
+- **Architecture**: Clean Architecture (3-layer) ✅ *UI complete, domain layer complete, data layer complete, state management in progress*
 - **Security**: Row Level Security (RLS) policies ✅ *10 policies enforced at database level*
 - **Geospatial**: PostGIS storage ✅ *schema ready*, client-side Haversine filtering ✅ *utilities implemented & tested*
 

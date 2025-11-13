@@ -38,13 +38,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Codebase Statistics
 
-- **Total Dart Files**: 39 files (~5,770 lines of code)
+- **Total Dart Files**: 42 files (~6,491 lines of code)
 - **Screens**: 3 complete screens (Auth Gate, Main Feed, Point Creation)
 - **Reusable Widgets**: 1 component (PointCard)
-- **Domain Entities**: 3 core models (Profile, Point, Like) + generated Freezed/JSON files
+- **Domain Entities**: 4 core models (Profile, Point, Like, AuthState) + generated Freezed/JSON files
 - **Repository Interfaces**: 3 contracts (IPointsRepository, IProfileRepository, ILikesRepository)
 - **Repository Implementations**: 3 Supabase implementations (~915 lines)
-- **Riverpod Providers**: 4 core providers (Supabase client + 3 repository providers)
+- **Riverpod Providers**: 10 providers (Supabase client + 3 repositories + 6 auth providers)
+- **State Notifiers**: 1 (AuthNotifier for authentication state management)
 - **Use Cases**: 8 business logic classes (Profile: 2, Point: 3, Like: 3)
 - **Request DTOs**: 8 strongly-typed request objects
 - **Geospatial Utilities**: 3 utilities (MaidenheadConverter, HaversineCalculator, DistanceFormatter)
@@ -65,7 +66,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Complete → **Data Layer Complete** → State Management Next
+**Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Complete → **State Management In Progress** (Auth Complete → Location Services Next)
 
 ### Completed (Phase 0-4): ✅
 
@@ -153,9 +154,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ Widget Tests: 21 tests
 - ✅ Integration Tests: 58 tests (real database)
 
-**State Management Layer (Phase 5.1): 🔄 IN PROGRESS**
+**State Management Layer (Phase 5): 🔄 IN PROGRESS**
 
-**Repository Providers (Phase 5.1):**
+**Repository Providers (Phase 5.1): ✅ COMPLETE**
 - ✅ **Supabase Initialization** - App-wide Supabase client initialization in main.dart
 - ✅ **ProviderScope Setup** - Riverpod enabled for entire app
 - ✅ **Repository Providers** - Core infrastructure providers:
@@ -164,17 +165,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - `pointsRepositoryProvider` - IPointsRepository implementation
   - `likesRepositoryProvider` - ILikesRepository implementation
 
-**Next Steps (Phase 5.2+):**
-- ❌ **Authentication State** (AuthNotifier, authProvider)
+**Authentication State (Phase 5.2): ✅ COMPLETE**
+- ✅ **AuthState Model** - Freezed union type (Unauthenticated, Authenticated, Loading, Error)
+- ✅ **AuthNotifier** - StateNotifier managing all auth operations (346 lines)
+  - Email/password sign in and sign up
+  - Google OAuth and Apple Sign In support
+  - Automatic profile creation during signup
+  - Session persistence via Supabase auth state stream
+  - User-friendly error mapping
+- ✅ **Auth Providers** - 6 Riverpod providers in `auth_providers.dart` (131 lines):
+  - `authNotifierProvider` - Main authentication state notifier
+  - `authStateProvider` - Convenience provider for current state
+  - `currentUserIdProvider` - Extracts userId when authenticated
+  - `hasProfileProvider` - Checks profile completion status
+  - `createProfileUseCaseProvider` - Profile creation use case
+  - `fetchProfileUseCaseProvider` - Profile fetching use case
+- ✅ **Documentation** - Comprehensive usage guide and architecture diagrams
+
+**Next Steps (Phase 5.3+):**
 - ❌ **Location Services** (GPS permission handling, StreamProvider for real-time location)
-- ❌ **Profile State Management** (ProfileNotifier, profile creation flow)
+- ❌ **Profile State Management** (ProfileNotifier, profile creation/update flows)
 - ❌ **Point Creation State** (DropPointNotifier, point creation flow)
 - ❌ **Feed State** (FetchNearbyPointsUseCase with 5km filtering)
 - ❌ **Like/Unlike State** (LikeNotifier, toggle functionality)
 - ❌ **Business Logic Wiring** (connect state to UI)
 - ❌ **Loading/Error States** (comprehensive error handling throughout UI)
 
-**Current Phase**: State Management Infrastructure → Authentication Next
+**Current Phase**: Authentication Complete → Location Services Next
 
 ## Project Structure
 
@@ -187,9 +204,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   │   │   ├── config/          # Environment configuration
 │   │   │   ├── constants/       # App-wide constants (spacing, sizes, colors)
 │   │   │   ├── providers/       # Riverpod providers ✅
-│   │   │   │   └── repository_providers.dart    # Repository providers
+│   │   │   │   ├── repository_providers.dart    # Repository providers (4 providers)
+│   │   │   │   └── auth_providers.dart          # Authentication providers (6 providers)
 │   │   │   └── theme/           # Material 3 theme v3.0 (BLUE DOMINANCE)
 │   │   ├── presentation/
+│   │   │   ├── notifiers/       # State management notifiers ✅
+│   │   │   │   ├── auth_notifier.dart           # Authentication state notifier (346 lines)
+│   │   │   │   └── README.md                    # Notifier usage documentation
 │   │   │   ├── screens/         # Auth, MainFeed, PointCreation screens
 │   │   │   └── widgets/         # Reusable PointCard component
 │   │   ├── domain/              # Domain layer (business logic)
@@ -202,7 +223,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   │   │   ├── entities/        # Domain entities with Freezed ✅
 │   │   │   │   ├── profile.dart (+ .freezed.dart, .g.dart)
 │   │   │   │   ├── point.dart (+ .freezed.dart, .g.dart)
-│   │   │   │   └── like.dart (+ .freezed.dart, .g.dart)
+│   │   │   │   ├── like.dart (+ .freezed.dart, .g.dart)
+│   │   │   │   └── auth_state.dart (+ .freezed.dart)    # Authentication state model
 │   │   │   ├── exceptions/      # Domain exceptions ✅
 │   │   │   │   └── repository_exceptions.dart
 │   │   │   ├── repositories/    # Repository interfaces ✅
