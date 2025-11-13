@@ -16,7 +16,7 @@ Every feature must reinforce this hyper-local, ephemeral nature. Content lives a
 
 ## Codebase Statistics
 
-- **Total Dart Files**: 48 files (~7,844 lines of code)
+- **Total Dart Files**: 62 files (~13,000 lines of code, excluding generated files)
 - **Screens**: 3 complete screens (Auth Gate, Main Feed, Point Creation)
 - **Reusable Widgets**: 1 component (PointCard - fully tested)
 - **Domain Layer**: 100% complete

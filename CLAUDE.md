@@ -38,7 +38,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Codebase Statistics
 
-- **Total Dart Files**: 48 files (~7,844 lines of code)
+- **Total Dart Files**: 62 files (~13,000 lines of code, excluding generated files)
 - **Screens**: 3 complete screens (Auth Gate, Main Feed, Point Creation)
 - **Reusable Widgets**: 1 component (PointCard)
 - **Domain Entities**: 6 core models (Profile, Point, Like, AuthState, LocationPermissionState, LocationServiceState) + generated Freezed/JSON files
@@ -67,7 +67,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Complete → **State Management In Progress** (Auth Complete → Location Services Next)
+**Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Complete → **State Management In Progress** (Auth + Location Complete → Profile/Point State Next)
 
 ### Completed (Phase 0-4): ✅
 
