@@ -38,11 +38,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Codebase Statistics
 
-- **Total Dart Files**: 35 files (~4,150 lines of code)
+- **Total Dart Files**: 38 files (~5,700 lines of code)
 - **Screens**: 3 complete screens (Auth Gate, Main Feed, Point Creation)
 - **Reusable Widgets**: 1 component (PointCard)
 - **Domain Entities**: 3 core models (Profile, Point, Like) + generated Freezed/JSON files
 - **Repository Interfaces**: 3 contracts (IPointsRepository, IProfileRepository, ILikesRepository)
+- **Repository Implementations**: 3 Supabase implementations (~915 lines)
 - **Use Cases**: 8 business logic classes (Profile: 2, Point: 3, Like: 3)
 - **Request DTOs**: 8 strongly-typed request objects
 - **Geospatial Utilities**: 3 utilities (MaidenheadConverter, HaversineCalculator, DistanceFormatter)
@@ -50,21 +51,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Domain Exceptions**: 7 exception classes
 - **Supabase Migrations**: 4 SQL schema files
 - **RLS Policies**: 10 security policies (profile: 4, points: 3, likes: 3)
-- **Test Coverage**: 287 comprehensive tests
+- **Test Coverage**: 345 comprehensive tests (~2,900 lines)
   - ✅ **Domain Utilities**: 91 tests
   - ✅ **Domain Entities**: 49 tests
   - ✅ **Domain Use Cases**: 126 tests
   - ✅ **Widget Tests**: 21 tests (PointCard: 20, smoke test: 1)
-- **Test Pass Rate**: 281/287 passing (97.9%)
+  - ✅ **Integration Tests**: 58 tests (repository implementations with real database)
+- **Test Pass Rate**: 331/345 passing (96.0%)
 - **Specialized AI Agents**: 8 agents for architecture domains
 - **Specification Documents**: 7 comprehensive spec files in `project_standards/`
 - **Theme Variants**: 2 modes (Light "BLUE IMMERSION", Dark "BLUE ELECTRIC")
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Next
+**Development Phase**: Database Setup Complete → Domain Layer Complete → **Data Layer Complete** → State Management Next
 
-### Completed (Phase 0-3.3): ✅
+### Completed (Phase 0-4): ✅
 
 **Backend & Infrastructure:**
 - ✅ **Local Supabase Environment** - Docker containers running with PostgreSQL 17 + PostGIS
@@ -124,21 +126,40 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ **Use Cases**: COMPLETE with comprehensive tests (126 tests)
 - ✅ **Widget Tests**: COMPLETE (21 tests for PointCard and smoke test)
 
-**Total Test Coverage**: 287 comprehensive tests (97.9% pass rate)
+**Data Layer (Phase 4): ✅ COMPLETE**
+
+**Repository Implementations:**
+- ✅ **SupabaseProfileRepository** - Profile CRUD with RLS enforcement (5 methods, ~274 lines)
+- ✅ **SupabasePointsRepository** - Point CRUD with PostGIS geometry handling (6 methods, ~335 lines)
+- ✅ **SupabaseLikesRepository** - Like operations with composite key handling (6 methods, ~306 lines)
+
+**Key Features:**
+- ✅ **RLS-Aware Design** - Defensive client-side checks mirror database RLS policies
+- ✅ **PostGIS Integration** - WKT format for INSERT/UPDATE, GeoJSON for SELECT
+- ✅ **Error Mapping** - PostgrestException → domain exceptions (23505 → DuplicateUsernameException, 42501 → UnauthorizedException, etc.)
+- ✅ **Comprehensive Documentation** - Inline comments explain RLS policies, constraints, and edge cases
+
+**Integration Test Coverage:**
+- ✅ **SupabaseProfileRepository Tests** - 23 tests (create, fetch, update, RLS, validation)
+- ✅ **SupabasePointsRepository Tests** - 19 tests (CRUD, PostGIS, content validation, deactivation)
+- ✅ **SupabaseLikesRepository Tests** - 16 tests (like/unlike, counts, duplicate prevention)
+- ✅ **Test Helper** - SupabaseTestHelper for integration test setup, cleanup, and auth
+
+**Total Test Coverage**: 345 comprehensive tests (96.0% pass rate)
 - ✅ Domain Utilities: 91 tests
 - ✅ Domain Entities: 49 tests
 - ✅ Domain Use Cases: 126 tests
 - ✅ Widget Tests: 21 tests
+- ✅ Integration Tests: 58 tests (real database)
 
 ### Not Yet Implemented: ❌
-- ❌ **Data Layer** (Supabase repository implementations, DTOs)
 - ❌ **State Management** (Riverpod providers not yet integrated)
 - ❌ **Business Logic Wiring** (buttons skip to next screen, no data persistence)
 - ❌ **API Integration** (Supabase client not wired to UI)
 - ❌ **Real Authentication** (OAuth buttons navigate directly to feed)
 - ❌ **Location Services Integration** (GPS permission handling, real-time location)
 
-**Next Phase**: Data Layer (Phase 4 - Supabase implementations), then State Management (Phase 5 - Riverpod wiring)
+**Next Phase**: State Management (Phase 5 - Riverpod wiring)
 
 ## Project Structure
 
@@ -177,18 +198,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   │   │       ├── like_use_cases/       # LikePointUseCase, UnlikePointUseCase, GetLikeCountUseCase
 │   │   │       ├── requests.dart         # 8 request DTOs
 │   │   │       └── use_case_base.dart    # Abstract UseCase<Success, Request> base class
-│   │   └── data/                # (Not yet implemented)
+│   │   └── data/                # Data layer ✅
+│   │       └── repositories/    # Supabase repository implementations ✅
+│   │           ├── supabase_profile_repository.dart    # Profile CRUD (274 lines)
+│   │           ├── supabase_points_repository.dart     # Point CRUD with PostGIS (335 lines)
+│   │           └── supabase_likes_repository.dart      # Like operations (306 lines)
 │   └── test/
 │       ├── widget_test.dart     # Basic widget test (1 test)
+│       ├── helpers/             # Test utilities ✅
+│       │   └── supabase_test_helper.dart    # Integration test helper
 │       ├── widget/              # Widget tests ✅
 │       │   └── point_card_test.dart    # PointCard component tests (20 tests)
-│       └── domain/              # Domain layer tests ✅
-│           ├── utils/           # Geospatial utility tests (91 tests)
-│           ├── entities/        # Entity tests (49 tests)
-│           └── use_cases/       # Use case tests (126 tests)
-│               ├── profile_use_cases/
-│               ├── point_use_cases/
-│               └── like_use_cases/
+│       ├── domain/              # Domain layer tests ✅
+│       │   ├── utils/           # Geospatial utility tests (91 tests)
+│       │   ├── entities/        # Entity tests (49 tests)
+│       │   └── use_cases/       # Use case tests (126 tests)
+│       │       ├── profile_use_cases/
+│       │       ├── point_use_cases/
+│       │       └── like_use_cases/
+│       └── data/                # Data layer integration tests ✅
+│           └── repositories/    # Repository integration tests (58 tests)
+│               ├── supabase_profile_repository_integration_test.dart    # 23 tests
+│               ├── supabase_points_repository_integration_test.dart     # 19 tests
+│               └── supabase_likes_repository_integration_test.dart      # 16 tests
 ├── supabase/                     # Supabase configuration
 │   ├── config.toml              # Auth providers, API settings
 │   └── migrations/              # Database schema migrations (4 files)

@@ -305,31 +305,9 @@ class SupabasePointsRepository implements IPointsRepository {
       );
     }
 
-    // HTTP status code mapping
-    if (e.statusCode != null) {
-      if (e.statusCode == '401' || e.statusCode == '403') {
-        return UnauthorizedException(
-          'Authorization failed for $operation: $message',
-        );
-      }
-
-      if (e.statusCode == '404') {
-        return NotFoundException(
-          'Resource not found for $operation: $message',
-        );
-      }
-
-      if (e.statusCode == '422') {
-        return ValidationException(
-          'Validation failed for $operation: $message',
-        );
-      }
-    }
-
     // Default to DatabaseException
     return DatabaseException(
       'Database error during $operation: $message (code: $code)',
-      httpStatusCode: e.statusCode != null ? int.tryParse(e.statusCode!) : null,
     );
   }
 }

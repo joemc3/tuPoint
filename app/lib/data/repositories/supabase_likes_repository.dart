@@ -183,14 +183,13 @@ class SupabaseLikesRepository implements ILikesRepository {
       }
 
       // Use count to get the number of likes
+      // Simply select and count the results (simpler than using count option)
       final response = await _client
           .from('likes')
-          .select('point_id', const FetchOptions(count: CountOption.exact))
+          .select('point_id')
           .eq('point_id', pointId);
 
-      // The count is available in the count property of the response
-      // For supabase_flutter, we need to use the count from PostgrestResponse
-      // Since we're selecting data, we get a list, so we count the list length
+      // Count the list length
       return (response as List).length;
     } on PostgrestException catch (e) {
       throw _mapPostgrestException(e, 'getLikeCountForPoint');
@@ -276,31 +275,9 @@ class SupabaseLikesRepository implements ILikesRepository {
       return NotFoundException('Like not found for $operation');
     }
 
-    // HTTP status code mapping
-    if (e.statusCode != null) {
-      if (e.statusCode == '401' || e.statusCode == '403') {
-        return UnauthorizedException(
-          'Authorization failed for $operation: $message',
-        );
-      }
-
-      if (e.statusCode == '404') {
-        return NotFoundException(
-          'Resource not found for $operation: $message',
-        );
-      }
-
-      if (e.statusCode == '422') {
-        return ValidationException(
-          'Validation failed for $operation: $message',
-        );
-      }
-    }
-
     // Default to DatabaseException
     return DatabaseException(
       'Database error during $operation: $message (code: $code)',
-      httpStatusCode: e.statusCode != null ? int.tryParse(e.statusCode!) : null,
     );
   }
 }

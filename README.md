@@ -12,11 +12,11 @@ Every feature must reinforce this hyper-local, ephemeral nature. Content lives a
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Next
+**Development Phase**: Database Setup Complete → Domain Layer Complete → **Data Layer Complete** → State Management Next
 
 ## Codebase Statistics
 
-- **Total Dart Files**: 35 files (~4,150 lines of code)
+- **Total Dart Files**: 38 files (~5,700 lines of code)
 - **Screens**: 3 complete screens (Auth Gate, Main Feed, Point Creation)
 - **Reusable Widgets**: 1 component (PointCard - fully tested)
 - **Domain Layer**: 100% complete
@@ -26,14 +26,20 @@ Every feature must reinforce this hyper-local, ephemeral nature. Content lives a
   - **Geospatial Utilities**: 3 utilities (Maidenhead, Haversine, Distance)
   - **Value Objects**: 1 type (LocationCoordinate)
   - **Exceptions**: 7 domain exception classes
+- **Data Layer**: 100% complete
+  - **Repository Implementations**: 3 Supabase repositories (~915 lines)
+  - **RLS-Aware**: Defensive checks mirror database policies
+  - **PostGIS Integration**: WKT/GeoJSON geometry handling
+  - **Error Mapping**: PostgrestException → domain exceptions
 - **Database**:
   - **Migrations**: 4 SQL schema files
   - **RLS Policies**: 10 security policies
-- **Test Coverage**: 287 comprehensive tests (97.9% pass rate)
+- **Test Coverage**: 345 comprehensive tests (96.0% pass rate)
   - ✅ Domain Utilities: 91 tests
   - ✅ Domain Entities: 49 tests
   - ✅ Domain Use Cases: 126 tests
   - ✅ Widget Tests: 21 tests
+  - ✅ Integration Tests: 58 tests (real database)
 - **Documentation**: 7 specification documents + comprehensive AI agent system
 - **Theme**: 2 polished variants (Light "BLUE IMMERSION", Dark "BLUE ELECTRIC")
 
@@ -124,16 +130,32 @@ The domain repository contracts are now defined:
 
 **Domain layer is now battle-tested and ready for data layer implementation.**
 
-### Next Phase: Data Layer 🚧
+### Phase 4: Data Layer ✅ COMPLETE
 
-Ready to implement (Phase 4):
-- ❌ **Data layer** - Supabase repository implementations, DTOs, RLS-aware error handling
-- ❌ **State management** - Riverpod providers wiring it all together (Phase 5)
+**Repository Implementations (2025-11-13):**
+- ✅ **SupabaseProfileRepository** - Profile CRUD with RLS enforcement (5 methods, 274 lines, 23 tests)
+- ✅ **SupabasePointsRepository** - Point CRUD with PostGIS geometry (6 methods, 335 lines, 19 tests)
+- ✅ **SupabaseLikesRepository** - Like operations with composite keys (6 methods, 306 lines, 16 tests)
+- ✅ **Integration tests** - 58 tests using real local Supabase database (not mocks)
+- ✅ **RLS-aware design** - Defensive client checks mirror database RLS policies
+- ✅ **Error mapping** - PostgrestException → domain exceptions (UnauthorizedException, NotFoundException, ValidationException, etc.)
+- ✅ **PostGIS integration** - WKT format for writes, GeoJSON for reads, automatic conversion
+- ✅ **Test helper** - SupabaseTestHelper for setup, cleanup, and test user management
+- ✅ **Test coverage** - From 287 tests → 345 tests (+58 integration tests, +20% increase)
+- ✅ **Pass rate** - 331/345 passing (96.0%)
+
+**Data layer is now complete and ready for state management wiring.**
+
+### Next Phase: State Management 🚧
+
+Ready to implement (Phase 5):
+- ❌ **State management** - Riverpod providers wiring repositories to UI
 - ❌ **Business logic integration** - Connect backend to UI mockups (Phase 6)
+- ❌ **Real authentication** - Wire OAuth and email/password flows
 
 **Quick Start:**
 - Run `flutter run` in the `app/` directory to see the UI mockup
-- Run `flutter test` to run all 287 tests (91 utils + 49 entities + 126 use cases + 21 widgets)
+- Run `flutter test` to run all 345 tests (91 utils + 49 entities + 126 use cases + 21 widgets + 58 integration)
 - Run `supabase start` to launch the local database environment
 
 ## Tech Stack
@@ -209,18 +231,29 @@ See [CLAUDE.md](CLAUDE.md) for complete development guidance.
 │   │   │       ├── like_use_cases/      # LikePointUseCase, UnlikePointUseCase, GetLikeCountUseCase
 │   │   │       ├── requests.dart        # 8 request DTOs
 │   │   │       └── use_case_base.dart   # Abstract UseCase<Success, Request> base class
-│   │   └── data/                # ❌ Not yet implemented
+│   │   └── data/                # ✅ Data layer (Supabase implementations)
+│   │       └── repositories/    # ✅ 3 repository implementations (~915 lines)
+│   │           ├── supabase_profile_repository.dart
+│   │           ├── supabase_points_repository.dart
+│   │           └── supabase_likes_repository.dart
 │   └── test/
 │       ├── widget_test.dart     # ✅ Basic widget test (1 test)
+│       ├── helpers/             # ✅ Test utilities
+│       │   └── supabase_test_helper.dart
 │       ├── widget/              # ✅ Widget tests (20 tests)
 │       │   └── point_card_test.dart
-│       └── domain/              # ✅ Domain layer tests (266 tests)
-│           ├── utils/           # ✅ Geospatial utility tests (91 tests)
-│           ├── entities/        # ✅ Entity tests (49 tests)
-│           └── use_cases/       # ✅ Use case tests (126 tests)
-│               ├── profile_use_cases/
-│               ├── point_use_cases/
-│               └── like_use_cases/
+│       ├── domain/              # ✅ Domain layer tests (266 tests)
+│       │   ├── utils/           # ✅ Geospatial utility tests (91 tests)
+│       │   ├── entities/        # ✅ Entity tests (49 tests)
+│       │   └── use_cases/       # ✅ Use case tests (126 tests)
+│       │       ├── profile_use_cases/
+│       │       ├── point_use_cases/
+│       │       └── like_use_cases/
+│       └── data/                # ✅ Data layer integration tests (58 tests)
+│           └── repositories/    # ✅ Repository integration tests (real database)
+│               ├── supabase_profile_repository_integration_test.dart
+│               ├── supabase_points_repository_integration_test.dart
+│               └── supabase_likes_repository_integration_test.dart
 ├── supabase/                     # ✅ Supabase configuration
 │   ├── config.toml              # ✅ Auth providers, API settings
 │   └── migrations/              # ✅ Database schema (4 migrations)
@@ -315,7 +348,7 @@ tuPoint's unique location system combines server-side precision with client-side
   - "1.2 km" for distances 1km and above
   - Implemented in `DistanceFormatter` utility with parsing support
 
-**Status**: All geospatial utilities are implemented and tested (91 passing tests). Domain entities with LocationCoordinate integration complete (49 passing tests). Repository interfaces defined with RLS-aware contracts. All MVP use cases implemented with comprehensive validation (8 use cases). Domain layer is complete. Ready for data layer implementation.
+**Status**: All geospatial utilities are implemented and tested (91 passing tests). Domain entities with LocationCoordinate integration complete (49 passing tests). Repository interfaces defined with RLS-aware contracts. All MVP use cases implemented with comprehensive validation (8 use cases). Domain layer is complete. Data layer implementations with Supabase are complete (3 repositories, 58 integration tests). Ready for state management wiring (Phase 5).
 
 ## Development Workflow
 
@@ -368,11 +401,13 @@ Advanced operations via slash commands:
 
 ```bash
 cd app
-flutter test                                    # All tests
-flutter test test/unit/                        # Unit tests only
-flutter test test/widget/                      # Widget tests only
-flutter test test/integration/                 # Integration tests
+flutter test                                    # All 345 tests
+flutter test test/domain/                       # Domain layer tests (266 tests)
+flutter test test/widget/                       # Widget tests (21 tests)
+flutter test test/data/repositories/            # Integration tests (58 tests, requires running Supabase)
 ```
+
+**Note**: Integration tests require local Supabase to be running (`supabase start`).
 
 ## Build-Measure-Learn Cycle
 
