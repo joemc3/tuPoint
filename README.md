@@ -12,9 +12,15 @@ Every feature must reinforce this hyper-local, ephemeral nature. Content lives a
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Complete → State Management COMPLETE → Integration Test Fixes COMPLETE → **Phase 6.1: Authentication UI COMPLETE** → Phase 6.1A: Playwright Testing Next
+**Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Complete → State Management COMPLETE → Integration Test Fixes COMPLETE → Phase 6.1: Authentication UI COMPLETE → **Phase 6.1A: Playwright E2E Testing COMPLETE** → Phase 6.2: Main Feed Integration Next
 
 **Latest Updates (2025-11-14):**
+- ✅ **Phase 6.1A Complete**: Playwright E2E testing infrastructure with 33 automated UI tests
+  - playwright-ui-tester specialized agent for automated test execution
+  - Complete test infrastructure in `app/test/e2e/` (helpers, fixtures, selectors)
+  - 6 test suites covering authentication flow, session persistence, visual regression, theme compliance, and error handling
+  - Baseline screenshot capture for visual regression testing
+  - Comprehensive documentation and test execution scripts
 - ✅ **Phase 6.1 Complete**: Full authentication flow integrated with email/password + OAuth support
   - AuthGateScreen with state-driven routing (387 lines)
   - ProfileCreationScreen for post-auth username collection (212 lines)
@@ -53,12 +59,20 @@ Every feature must reinforce this hyper-local, ephemeral nature. Content lives a
 - **Database**:
   - **Migrations**: 4 SQL schema files
   - **RLS Policies**: 10 security policies
-- **Test Coverage**: 394 passing + 2 skipped = 396 tests (100% pass rate for non-skipped)
-  - ✅ Domain Utilities: 91 tests
-  - ✅ Domain Entities: 73 tests (Profile, Point, Like, LocationPermissionState, LocationServiceState)
-  - ✅ Domain Use Cases: 143 tests (includes FetchNearbyPointsUseCase, security tests)
-  - ✅ Widget Tests: 21 tests
-  - ✅ Integration Tests: 56 passing + 2 skipped (real database with Supabase)
+- **Test Coverage**:
+  - **Unit/Integration**: 394 passing + 2 skipped = 396 tests (100% pass rate for non-skipped)
+    - Domain Utilities: 91 tests
+    - Domain Entities: 73 tests (Profile, Point, Like, LocationPermissionState, LocationServiceState)
+    - Domain Use Cases: 143 tests (includes FetchNearbyPointsUseCase, security tests)
+    - Widget Tests: 21 tests
+    - Integration Tests: 56 passing + 2 skipped (real database with Supabase)
+  - **E2E Tests (Phase 6.1A)**: 33 Playwright tests
+    - Sign Up Flow: 10 tests
+    - Sign In Flow: 5 tests
+    - Session Persistence: 3 tests
+    - Visual Regression: 6 tests
+    - Theme Compliance: 5 tests
+    - Error Handling: 4 tests
 - **Documentation**: 9 specification documents in project_standards/ (including 73KB state management guide) + comprehensive AI agent system
 - **Theme**: 2 polished variants (Light "BLUE IMMERSION", Dark "BLUE ELECTRIC")
 
@@ -422,11 +436,21 @@ See [CLAUDE.md](CLAUDE.md) for complete development guidance.
 │       │       ├── profile_use_cases/
 │       │       ├── point_use_cases/
 │       │       └── like_use_cases/
-│       └── data/                # ✅ Data layer integration tests (58 tests)
-│           └── repositories/    # ✅ Repository integration tests (real database)
-│               ├── supabase_profile_repository_integration_test.dart
-│               ├── supabase_points_repository_integration_test.dart
-│               └── supabase_likes_repository_integration_test.dart
+│       ├── data/                # ✅ Data layer integration tests (58 tests)
+│       │   └── repositories/    # ✅ Repository integration tests (real database)
+│       │       ├── supabase_profile_repository_integration_test.dart
+│       │       ├── supabase_points_repository_integration_test.dart
+│       │       └── supabase_likes_repository_integration_test.dart
+│       └── e2e/                 # ✅ E2E tests (Phase 6.1A - 33 Playwright tests)
+│           ├── playwright.config.ts
+│           ├── package.json
+│           ├── README.md
+│           ├── helpers/         # Test setup utilities, selectors, auth helpers
+│           ├── fixtures/        # Test data and user fixtures
+│           ├── tests/           # 6 test suites (sign-up, sign-in, session, visual, theme, errors)
+│           ├── screenshots/     # Baseline, failures, and diff images
+│           ├── reports/         # HTML test reports
+│           └── traces/          # Playwright trace files
 ├── supabase/                     # ✅ Supabase configuration
 │   ├── config.toml              # ✅ Auth providers, API settings
 │   └── migrations/              # ✅ Database schema (4 migrations)
@@ -442,6 +466,8 @@ See [CLAUDE.md](CLAUDE.md) for complete development guidance.
 │   └── project-theme.md         # ✅ v3.0 - Aggressive Location Blue usage
 ├── general_standards/           # Flutter/UX best practices
 ├── .claude/                     # AI agents and automation commands
+│   └── agents/                  # ✅ 9 specialized agents
+│       └── playwright-ui-tester.md  # ✅ E2E testing agent (Phase 6.1A)
 └── .env.example                  # ✅ OAuth setup documentation
 ```
 
@@ -482,7 +508,7 @@ This project follows a **specification-first approach**. All implementation deci
 
 ### Specialized AI Agents
 
-The project uses 8 specialized Claude Code agents for implementation:
+The project uses 9 specialized Claude Code agents for implementation:
 
 - `state-management-architect` - Riverpod providers, use cases
 - `flutter-ui-builder` - UI widgets from UX specs
@@ -492,6 +518,7 @@ The project uses 8 specialized Claude Code agents for implementation:
 - `supabase-schema-architect` - Database design, migrations
 - `qa-testing-agent` - Test implementation
 - `theme-architect` - Visual design system
+- `playwright-ui-tester` - E2E UI testing via MCP Playwright server
 
 ### Clean Architecture + Riverpod
 
@@ -574,6 +601,7 @@ Advanced operations via slash commands:
 
 ### Running Tests
 
+#### Unit & Integration Tests
 ```bash
 cd app
 flutter test                                    # All 396 tests (394 passing, 2 skipped)
@@ -586,6 +614,36 @@ flutter test test/data/repositories/ --concurrency=1  # Integration tests (58 te
 - Integration tests require local Supabase to be running (`supabase start`)
 - Integration tests must run sequentially (`--concurrency=1`) to prevent data conflicts
 - 2 tests are skipped due to known RLS test environment auth synchronization issues
+
+#### E2E Tests (Playwright)
+```bash
+cd app/test/e2e
+
+# First time setup
+npm install
+npx playwright install chromium
+
+# Run all E2E tests (33 tests)
+npm test
+
+# Run specific test suite
+npm run test:signup      # Sign up flow (10 tests)
+npm run test:signin      # Sign in flow (5 tests)
+npm run test:visual      # Visual regression (6 tests)
+
+# View HTML report
+npm run test:report
+
+# Run in interactive UI mode
+npm run test:ui
+```
+
+**Prerequisites for E2E tests**:
+- Supabase running: `supabase start`
+- Flutter web app running: `flutter run -d chrome`
+- Playwright MCP server connected via Docker gateway
+
+See `app/test/e2e/README.md` for detailed E2E testing documentation.
 
 ## Build-Measure-Learn Cycle
 
