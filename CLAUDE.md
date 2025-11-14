@@ -53,21 +53,11 @@ Assistant Response (CORRECT):
 [Even for planning, check branch BEFORE any file reads]
 ```
 
-**What Went Wrong in This Session:**
-- ❌ Started work immediately without branch check
-- ❌ Made file edits directly on `main` branch
-- ❌ Had to retroactively create `fix/integration-test-isolation` branch
-
-**Correct Behavior:**
-- ✅ FIRST action: Check git branch
-- ✅ IF on main: Ask user + create feature branch
-- ✅ THEN proceed with requested work
-
 ---
 
 ## ⚠️ CRITICAL: Git Branching Policy
 
-This policy is enforced by the SESSION START CHECKLIST above. Additional details:
+This policy is enforced by the SESSION START CHECKLIST above.
 
 **This applies to:**
 - All direct file operations (Write, Edit, NotebookEdit)
@@ -90,389 +80,73 @@ This policy is enforced by the SESSION START CHECKLIST above. Additional details
 
 ## Project Overview
 
-**tuPoint (tP.2)** is a specification-driven Flutter application for hyper-local, ephemeral social media where content disappears when users leave the area. The project uniquely combines detailed specification documents with specialized AI agents for implementation.
+**tuPoint (tP.2)** is a specification-driven Flutter application for hyper-local, ephemeral social media where content disappears when users leave the area.
 
 **Key Principle**: "Content disappears when you leave the area" - every feature must reinforce this hyper-local, ephemeral nature.
 
-## Codebase Statistics
-
-- **Total Dart Files**: 74 files (~16,000 lines of code, excluding generated files)
-- **Screens**: 3 complete screens (Auth Gate, Main Feed, Point Creation)
-- **Reusable Widgets**: 1 component (PointCard)
-- **Domain Entities**: 10 core models (Profile, Point, Like, AuthState, ProfileState, PointDropState, FeedState, LikeState, LocationPermissionState, LocationServiceState) + generated Freezed/JSON files
-- **Repository Interfaces**: 3 contracts (IPointsRepository, IProfileRepository, ILikesRepository)
-- **Repository Implementations**: 3 Supabase implementations (~915 lines)
-- **Core Services**: 1 (LocationService for GPS and permissions - 318 lines)
-- **Riverpod Providers**: 27 providers across 5 provider files (Supabase + 3 repositories + 6 auth + 6 location + 4 profile + 7 point/feed/like)
-- **State Notifiers**: 5 notifiers (~2,500 lines total)
-  - AuthNotifier (346 lines) - Authentication state
-  - ProfileNotifier - Profile fetch/update
-  - PointDropNotifier - Point creation with GPS
-  - FeedNotifier - Nearby points filtering
-  - LikeNotifier - Like/unlike with optimistic updates
-- **Use Cases**: 11 business logic classes (Profile: 3, Point: 3, Like: 3, GetLikeCount: 1, FetchNearbyPoints: 1)
-- **Request DTOs**: 9 strongly-typed request objects (added UpdateProfileRequest)
-- **Geospatial Utilities**: 3 utilities (MaidenheadConverter, HaversineCalculator, DistanceFormatter)
-- **Value Objects**: 1 immutable type (LocationCoordinate)
-- **Domain Exceptions**: 7 exception classes
-- **Supabase Migrations**: 4 SQL schema files
-- **RLS Policies**: 10 security policies (profile: 4, points: 3, likes: 3)
-- **Test Coverage**: 396 comprehensive tests (~3,500 lines) including security tests
-  - ✅ **Domain Utilities**: 91 tests
-  - ✅ **Domain Entities**: 73 tests (Profile: 25, Point: 16, Like: 8, LocationPermissionState: 9, LocationServiceState: 15)
-  - ✅ **Domain Use Cases**: 143 tests (includes 17 FetchNearbyPointsUseCase tests - fixed after rebase)
-  - ✅ **Widget Tests**: 21 tests (PointCard: 20, smoke test: 1)
-  - ✅ **Integration Tests**: 56 passing + 2 skipped = 58 tests (repository implementations with real database)
-  - ✅ **Security Tests**: 27 tests (InputSanitizer utility added in security remediation)
-- **Test Pass Rate**: 394 passing + 2 skipped = 396 total (100% pass rate for non-skipped tests)
-- **Specialized AI Agents**: 8 agents for architecture domains
-- **Specification Documents**: 9 comprehensive spec files in `project_standards/` (including AUTH_ARCHITECTURE.md, STATE_MANAGEMENT_IMPLEMENTATION.md)
-- **Theme Variants**: 2 modes (Light "BLUE IMMERSION", Dark "BLUE ELECTRIC")
-
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Complete → **State Management COMPLETE** (Phase 5.1-5.4) → **Integration Test Fixes COMPLETE** (Phase 5.6) → UI Integration Next
+**Development Phase**: Phase 6.1 Complete (Authentication Flow) → Phase 6.2 Next (Main Feed Integration)
 
-### Completed (Phase 0-4): ✅
+### What's Complete ✅
 
-**Backend & Infrastructure:**
-- ✅ **Local Supabase Environment** - Docker containers running with PostgreSQL 17 + PostGIS
-- ✅ **Database Schema** - 4 migrations applied (profile, points, likes tables)
-- ✅ **Row Level Security (RLS)** - 10 RLS policies enforcing authorization at database level (profile: 4, points: 3, likes: 3). Points table intentionally omits DELETE policy (soft delete via UPDATE). Likes table intentionally omits UPDATE policy (likes are immutable).
-- ✅ **PostGIS Spatial Support** - GEOMETRY(POINT, 4326) for lat/lon storage
-- ✅ **Auth Providers** - Email/Password, Google OAuth, Apple Sign In configured
-- ✅ **Environment Config** - `.env` and `env_config.dart` for local development
+**Backend Infrastructure:**
+- Local Supabase (PostgreSQL 17 + PostGIS)
+- 4 database migrations (profile, points, likes tables)
+- 10 RLS policies enforcing authorization
+- Auth providers (Email/Password, Google OAuth, Apple Sign In)
 
-**Presentation Layer (UI Only):**
-- ✅ **Full UI mockups** with hardcoded test data for visual demonstration
-- ✅ **v3.0 "BLUE DOMINANCE" theme** - Location Blue (#3A9BFC) prominently featured throughout
-- ✅ **3 navigable screens**: Authentication Gate → Main Feed (with 5 Point cards) → Point Creation
-- ✅ **Material 3 design** with Inter typography
-- ✅ **100% theme compliance** - zero hardcoded colors, fonts, or sizes
+**Domain Layer:**
+- 10 entities (Profile, Point, Like, + 7 state models)
+- 3 repository interfaces (IPointsRepository, IProfileRepository, ILikesRepository)
+- 11 use cases (Profile: 3, Point: 3, Like: 3, + 2 helpers)
+- 3 geospatial utilities (Maidenhead, Haversine, Distance Formatter)
+- 7 domain exceptions
 
-**Domain Layer Foundation (Phase 2.1):**
-- ✅ **Dependencies Installed** - Riverpod, Supabase, Geolocator, Freezed, JSON serialization packages
-- ✅ **LocationCoordinate Value Object** - Immutable lat/lon with validation
-- ✅ **MaidenheadConverter Utility** - Ham radio grid square system (~800m precision)
-- ✅ **HaversineCalculator Utility** - Great-circle distance calculation (<0.5% error)
-- ✅ **DistanceFormatter Utility** - Human-readable distance display
-- ✅ **Comprehensive Test Coverage** - 91 passing tests for all geospatial utilities
+**Data Layer:**
+- 3 Supabase repository implementations (~915 lines)
+- PostGIS geometry handling (WKT/GeoJSON)
+- RLS-aware error mapping
 
-**Domain Layer Entities (Phase 3.1):**
-- ✅ **Profile Entity** - Freezed immutable model with id, username, bio, timestamps
-- ✅ **Point Entity** - Freezed model with LocationCoordinate integration, PostGIS geometry converter
-- ✅ **Like Entity** - Freezed model representing composite key relationship
-- ✅ **JSON Serialization** - Snake_case to camelCase mapping for all entities
-- ✅ **Entity Test Coverage** - 49 comprehensive tests for all entities (25 Profile, 16 Point, 8 Like)
+**State Management:**
+- 5 notifiers (~2,500 lines): Auth, Profile, PointDrop, Feed, Like
+- 27 Riverpod providers across 5 files
+- Complete state models for all operations
 
-**Domain Layer Repository Interfaces (Phase 3.2):**
-- ✅ **IPointsRepository** - Abstract contract for Point CRUD operations (6 methods)
-- ✅ **IProfileRepository** - Abstract contract for Profile operations (5 methods)
-- ✅ **ILikesRepository** - Abstract contract for Like operations (6 methods)
-- ✅ **Domain Exceptions** - 7 exception classes (UnauthorizedException, NotFoundException, ValidationException, etc.)
-- ✅ **RLS-Aware Design** - Repository methods mirror database RLS policies
-- ✅ **Technology-Agnostic** - No Supabase imports, pure Dart interfaces
+**Services:**
+- LocationService (GPS + permissions, 318 lines)
 
-**Domain Layer Use Cases (Phase 3.3):**
-- ✅ **CreateProfileUseCase** - Profile creation with username validation
-- ✅ **FetchProfileUseCase** - Get user profile by ID
-- ✅ **DropPointUseCase** - Create Point with content validation (1-280 chars)
-- ✅ **FetchNearbyPointsUseCase** - 5km radius filtering with HaversineCalculator
-- ✅ **FetchUserPointsUseCase** - Get user's points sorted by date
-- ✅ **LikePointUseCase** - Like a point
-- ✅ **UnlikePointUseCase** - Unlike a point
-- ✅ **GetLikeCountUseCase** - Get like count for a point
-- ✅ **Request DTOs** - 8 strongly-typed request classes
-- ✅ **UseCase Base Class** - Abstract generic class for all use cases
-- ✅ **Comprehensive Test Coverage** - 126 tests for all use cases (validation, error handling, edge cases)
+**UI (Phase 6.1 Complete):**
+- AuthGateScreen with state-driven routing
+- Email/password authentication flow
+- ProfileCreationScreen for new users
+- Theme v3.0 "BLUE DOMINANCE" applied
 
-**Domain Layer Status**:
-- ✅ **Utilities**: COMPLETE with comprehensive tests (91 tests)
-- ✅ **Entities**: COMPLETE with comprehensive tests (49 tests)
-- ✅ **Repository Interfaces**: COMPLETE (technology-agnostic contracts)
-- ✅ **Use Cases**: COMPLETE with comprehensive tests (126 tests)
-- ✅ **Widget Tests**: COMPLETE (21 tests for PointCard and smoke test)
+**Testing:**
+- 394 passing + 2 skipped = 396 total tests
+- Domain: 91 utility + 73 entity + 143 use case tests
+- Widget: 21 tests
+- Integration: 56 passing + 2 skipped tests
+- Security: 27 tests
 
-**Data Layer (Phase 4): ✅ COMPLETE**
+### Known Issues (Phase 6 Cleanup)
 
-**Repository Implementations:**
-- ✅ **SupabaseProfileRepository** - Profile CRUD with RLS enforcement (5 methods, ~274 lines)
-- ✅ **SupabasePointsRepository** - Point CRUD with PostGIS geometry handling (6 methods, ~335 lines)
-- ✅ **SupabaseLikesRepository** - Like operations with composite key handling (6 methods, ~306 lines)
+Address at end of Phase 6:
+- ⚠️ **Theme Consistency** - Some fonts/sizes hardcoded instead of from theme/constants
+- ⚠️ **Password Validation** - Should allow special characters (!, @, #, $, %, etc.)
+- ⚠️ **In-Form Validation** - Email/password validation on input, not submit
+- ⚠️ **Form State Persistence** - Prefill form after submission errors
+- ⚠️ **Field Error Highlighting** - Visual indicators for invalid fields
+- ⚠️ **Missing Logout** - No sign out button (must reset database)
+- ⚠️ **Missing User Menu** - Need menu for logout and profile editing
 
-**Key Features:**
-- ✅ **RLS-Aware Design** - Defensive client-side checks mirror database RLS policies
-- ✅ **PostGIS Integration** - WKT format for INSERT/UPDATE, GeoJSON for SELECT
-- ✅ **Error Mapping** - PostgrestException → domain exceptions (23505 → DuplicateUsernameException, 42501 → UnauthorizedException, etc.)
-- ✅ **Comprehensive Documentation** - Inline comments explain RLS policies, constraints, and edge cases
+### Next Steps
 
-**Integration Test Coverage:**
-- ✅ **SupabaseProfileRepository Tests** - 23 tests (create, fetch, update, RLS, validation)
-- ✅ **SupabasePointsRepository Tests** - 19 tests (CRUD, PostGIS, content validation, deactivation)
-- ✅ **SupabaseLikesRepository Tests** - 16 tests (like/unlike, counts, duplicate prevention)
-- ✅ **Test Helper** - SupabaseTestHelper for integration test setup, cleanup, and auth
-
-**Total Test Coverage**: 396 comprehensive tests (97.5% pass rate)
-- ✅ Domain Utilities: 91 tests
-- ✅ Domain Entities: 73 tests (includes LocationPermissionState and LocationServiceState)
-- ✅ Domain Use Cases: 143 tests (includes FetchNearbyPointsUseCase - 17 tests)
-- ✅ Widget Tests: 21 tests
-- ✅ Integration Tests: 58 tests (real database) - 10 with isolation issues pending fix
-- ✅ Security Tests: 27 tests (InputSanitizer utility)
-
-**State Management Layer (Phase 5): ✅ COMPLETE**
-
-**Repository Providers (Phase 5.1): ✅ COMPLETE**
-- ✅ **Supabase Initialization** - App-wide Supabase client initialization in main.dart
-- ✅ **ProviderScope Setup** - Riverpod enabled for entire app
-- ✅ **Repository Providers** - Core infrastructure providers:
-  - `supabaseClientProvider` - Singleton Supabase client access
-  - `profileRepositoryProvider` - IProfileRepository implementation
-  - `pointsRepositoryProvider` - IPointsRepository implementation
-  - `likesRepositoryProvider` - ILikesRepository implementation
-
-**Authentication State (Phase 5.2): ✅ COMPLETE**
-- ✅ **AuthState Model** - Freezed union type (Unauthenticated, Authenticated, Loading, Error)
-- ✅ **AuthNotifier** - StateNotifier managing all auth operations (346 lines)
-  - Email/password sign in and sign up
-  - Google OAuth and Apple Sign In support
-  - Automatic profile creation during signup
-  - Session persistence via Supabase auth state stream
-  - User-friendly error mapping
-- ✅ **Auth Providers** - 6 Riverpod providers in `auth_providers.dart` (131 lines):
-  - `authNotifierProvider` - Main authentication state notifier
-  - `authStateProvider` - Convenience provider for current state
-  - `currentUserIdProvider` - Extracts userId when authenticated
-  - `hasProfileProvider` - Checks profile completion status
-  - `createProfileUseCaseProvider` - Profile creation use case
-  - `fetchProfileUseCaseProvider` - Profile fetching use case
-- ✅ **Documentation** - Comprehensive usage guide and architecture diagrams
-
-**Location Services (Phase 5.3): ✅ COMPLETE**
-- ✅ **LocationPermissionState Model** - Freezed union type (notAsked, granted, denied, deniedForever, serviceDisabled)
-- ✅ **LocationServiceState Model** - Freezed union type (loading, available, permissionDenied, serviceDisabled, error)
-- ✅ **LocationService Class** - GPS and permission handling service (318 lines)
-  - Check and request location permissions
-  - One-time location fetch (getCurrentLocation)
-  - Real-time location stream (getLocationStream)
-  - Platform settings access (openLocationSettings, openAppSettings)
-  - High accuracy GPS with 10m distance filter
-- ✅ **Location Providers** - 6 Riverpod providers in `location_providers.dart` (217 lines):
-  - `locationServiceProvider` - LocationService instance
-  - `locationPermissionProvider` - Current permission state
-  - `currentLocationProvider` - One-time location fetch
-  - `locationStreamProvider` - Real-time location stream
-  - `hasLocationPermissionProvider` - Boolean permission check
-  - `locationServicesEnabledProvider` - GPS enabled check
-- ✅ **Platform Configuration** - iOS Info.plist and Android AndroidManifest.xml updated
-- ✅ **Test Coverage** - 24 tests for location state models (100% pass rate)
-- ✅ **Documentation** - 3 comprehensive guides (README, Quick Start, Summary)
-
-**Application State (Phase 5.4): ✅ COMPLETE**
-- ✅ **ProfileState Model** - Freezed union type (initial, loading, loaded, error)
-- ✅ **ProfileNotifier** - StateNotifier for profile operations
-  - Fetch user profiles by ID
-  - Update profile (username, bio)
-  - User-friendly error mapping
-- ✅ **UpdateProfileUseCase** - Profile update business logic with validation
-- ✅ **Profile Providers** - 4 Riverpod providers in `profile_providers.dart`:
-  - `updateProfileUseCaseProvider` - UpdateProfileUseCase instance
-  - `profileNotifierProvider` - Main profile state notifier
-  - `profileStateProvider` - Convenience provider for current state
-  - `currentProfileProvider` - Extracts Profile from loaded state
-- ✅ **PointDropState Model** - Freezed union type (initial, fetchingLocation, dropping, success, error)
-- ✅ **PointDropNotifier** - StateNotifier for point creation with GPS integration
-  - Two-phase operation (GPS fetch → database create)
-  - Automatic Maidenhead conversion
-  - Location service integration
-- ✅ **FeedState Model** - Freezed union type (initial, loading, loaded with location, error)
-- ✅ **FeedNotifier** - StateNotifier for nearby points feed
-  - 5km radius filtering via HaversineCalculator
-  - Real-time location integration
-  - Excludes user's own points
-  - Sorted by distance (nearest first)
-- ✅ **LikeState Model** - Freezed data class for per-point like tracking
-- ✅ **LikeNotifier** - StateNotifier for like/unlike with optimistic updates
-  - Instant UI feedback (optimistic updates)
-  - Automatic rollback on errors
-  - Per-point independent state
-  - Concurrent like operations supported
-- ✅ **Point Providers** - 16 providers in `point_providers.dart`:
-  - Use case providers (5): drop, fetchNearby, like, unlike, getLikeCount
-  - Point drop providers (3): notifier, state, isDropping
-  - Feed providers (4): notifier, state, nearbyPoints, isLoading
-  - Like providers (4): notifier, state, pointLikeStatus (family), pointLikeCount (family)
-- ✅ **Comprehensive Documentation** - 73KB STATE_MANAGEMENT_IMPLEMENTATION.md with:
-  - Complete architecture documentation
-  - 15+ usage examples
-  - Data flow diagrams
-  - Error handling strategies
-  - Testing guidelines
-  - Integration checklist
-
-**State Management Summary:**
-- **7 State Models**: AuthState, ProfileState, PointDropState, FeedState, LikeState, LocationPermissionState, LocationServiceState
-- **5 Notifiers**: AuthNotifier, ProfileNotifier, PointDropNotifier, FeedNotifier, LikeNotifier (~2,500 lines)
-- **27 Providers**: Across 5 provider files (repository, auth, location, profile, point/feed/like)
-- **11 Use Cases**: All wired into state layer
-
-**Post-Rebase Fixes (Phase 5.5): ✅ COMPLETE**
-
-After merging security remediation branch to main, rebased feature/profile-point-state and fixed issues:
-
-- ✅ **Security Remediation Merge** - Integrated security fixes from main branch
-  - InputSanitizer utility (147 lines, Unicode-aware validation)
-  - Enhanced password policy (requires lowercase + uppercase + digits)
-  - HTTPS enforcement for Android
-  - Environment validation improvements
-  - 27 new security tests
-
-- ✅ **Test Coordinate Fixes** - Fixed FetchNearbyPointsUseCase tests (test/domain/use_cases/point_use_cases/fetch_nearby_points_use_case_test.dart:58-519)
-  - Root cause: Test coordinates were incorrectly labeled (claimed ~2km, actually 5.31km)
-  - Fixed 6 test methods with correct coordinates using HaversineCalculator.calculateDestination()
-  - All 17 FetchNearbyPointsUseCase tests now passing
-
-- ✅ **Integration Test Password Updates** - Updated test passwords for new security policy
-  - Changed from `password123` to `TestPass123` in 3 integration test files
-  - supabase_profile_repository_integration_test.dart
-  - supabase_points_repository_integration_test.dart
-  - supabase_likes_repository_integration_test.dart
-
-**Integration Test Isolation Fixes (Phase 5.6): ✅ COMPLETE**
-
-After diagnosing and resolving integration test failures (2025-11-14):
-
-- ✅ **Root Cause Analysis** - 10 integration test failures caused by RLS policies preventing test data cleanup
-  - Tests were leaving stale data due to RLS blocking DELETE operations
-  - Cleanup methods couldn't delete records without proper authentication context
-  - Username conflicts occurred when tests ran multiple times
-
-- ✅ **Service Role Key Integration** - Added Supabase service role key to test helper (test/helpers/supabase_test_helper.dart:16-17)
-  - Service role key bypasses RLS for administrative operations
-  - Enables complete test data cleanup between runs
-  - Prevents test isolation issues from cascading
-
-- ✅ **Admin Client Implementation** - Created separate admin client for cleanup operations (test/helpers/supabase_test_helper.dart:61-64, 86-88)
-  - Admin client uses service role key instead of anon key
-  - Cleanup now uses admin client to bypass RLS
-  - Regular client still uses anon key for testing actual application behavior
-
-- ✅ **Test Fixes**:
-  - Fixed email typo in likes repository test: `'test-nouserlik es@example.com'` → `'test-nouserlikes@example.com'` (test/data/repositories/supabase_likes_repository_integration_test.dart:324)
-  - Skipped 2 deactivatePoint tests with detailed TODO comments (test/data/repositories/supabase_points_repository_integration_test.dart:187, 437)
-  - Added 500ms auth state synchronization delay after user creation (test/helpers/supabase_test_helper.dart:133)
-  - Integration tests now run sequentially (`--concurrency=1`) to prevent parallel data conflicts
-
-- ✅ **CLAUDE.md Enhancement** - Added mandatory session start checklist to prevent working on main branch
-  - 🚨 Mandatory Session Start Checklist at top of file (impossible to miss)
-  - 🔄 Session Start Protocol with correct/incorrect behavioral examples
-  - Documented this session's branching policy violation as a learning example for future sessions
-
-**Test Results:**
-- **Before**: 46 passing / 10 failing (82% pass rate for integration tests)
-- **After**: 56 passing + 2 skipped = 58 total (100% pass rate for non-skipped integration tests)
-- **Overall Project**: 394 passing + 2 skipped = 396 total (100% pass rate for non-skipped tests)
-
-**Skipped Tests (2):**
-Both tests involve `deactivatePoint` operation and fail with RLS errors in the test environment:
-- `fetchAllActivePoints returns only active points` - Tests filtering after deactivation
-- `deactivatePoint deactivates point successfully` - Tests deactivation operation directly
-
-Root cause: Rapid sign-out/sign-in cycles in test environment cause auth state synchronization issues with database RLS layer. Production code works correctly (verified by other UPDATE operations like `updatePointContent` succeeding). These are test environment conditions, not production bugs.
-
-**UI Integration (Phase 6): ⏳ IN PROGRESS**
-
-**Phase 6.1: Authentication Flow (✅ COMPLETE - 2025-11-14)**
-
-Integrated complete authentication system with state-driven routing and profile creation flow.
-
-**UI Components Created:**
-- ✅ **AuthGateScreen** - Root router with state-based navigation (325 lines)
-  - ConsumerWidget watching authStateProvider
-  - Routes to appropriate screen based on auth state
-  - 4 internal screens: _LoginScreen, _LoadingScreen, _ErrorScreen, MainFeedScreen
-- ✅ **_LoginScreen** - Email/password authentication form (217 lines)
-  - Sign in mode: Email + password
-  - Sign up mode: Email + password (no username - collected later)
-  - Toggle between sign in/sign up modes
-  - OAuth buttons (disabled - for future configuration)
-  - Loading states on buttons
-  - Error snackbars for auth failures
-- ✅ **ProfileCreationScreen** - Username/bio collection (212 lines)
-  - Shown after sign up or OAuth (when hasProfile = false)
-  - Username validation (3-20 chars, alphanumeric + underscore)
-  - Optional bio field (max 280 chars)
-  - Calls authNotifier.completeProfile()
-
-**AuthNotifier Enhancements:**
-- ✅ **signUpEmailOnly()** - New method for email/password sign up (44 lines)
-  - Creates auth account ONLY (no profile creation)
-  - Sets state to authenticated(hasProfile: false)
-  - Routes user to ProfileCreationScreen
-- ✅ **completeProfile()** - Post-auth profile creation (42 lines)
-  - For OAuth and email/password sign-up users
-  - Creates profile record via CreateProfileUseCase
-  - Handles duplicate username and validation errors
-
-**Authentication Flow:**
-```
-Email/Password Sign Up → Profile Creation Screen → Main Feed
-      OAuth Sign In → Profile Creation Screen → Main Feed
-Email/Password Sign In → Main Feed (profile already exists)
-```
-
-**Key Features:**
-- ✅ Consistent flow for all auth methods (email/password + OAuth)
-- ✅ State-driven routing (zero manual navigation)
-- ✅ Session persistence across app restarts
-- ✅ User-friendly error messages (snackbars)
-- ✅ Loading indicators during async operations
-- ✅ Form validation (email, password, username)
-- ✅ Theme v3.0 "BLUE DOMINANCE" applied throughout
-
-**Files Modified:**
-- `app/lib/presentation/screens/auth_gate_screen.dart` - Complete rewrite (387 lines)
-- `app/lib/presentation/notifiers/auth_notifier.dart` - Added signUpEmailOnly() and completeProfile()
-- `app/lib/presentation/screens/profile_creation_screen.dart` - New file (212 lines)
-
-**Documentation Updated:**
-- ✅ `project_standards/UX_user_flow.md` - Added email/password flow, updated Screen 1 and Screen 2
-- ✅ `project_standards/AUTH_ARCHITECTURE.md` - Updated component diagram, added modern flow diagrams
-- ✅ Comprehensive testing guide created (6 test suites, 28 test cases)
-
-**UX Refinements:**
-- ✅ **Tagline Changed** - From "Content disappears when you leave the area" to "what's your point?" (more engaging, punny)
-  - Updated in `auth_gate_screen.dart:123`
-  - Updated in `UX_user_flow.md:28`
-
-**Testing Status:**
-- Manual testing recommended (see testing guide above)
-- Covers: sign up, sign in, session persistence, validation, error handling, UI/UX verification
-
-**Known Issues to Address (Phase 6 Cleanup - End of Phase 6):**
-- ⚠️ **Theme Consistency** - Some fonts/sizes set directly in widgets instead of from theme/constants
-- ⚠️ **Password Validation** - Should allow common special characters (!, @, #, $, %, etc.)
-- ⚠️ **In-Form Validation** - Password and email validation should happen on input, not on submit
-- ⚠️ **Form State Persistence** - After submission error, form should be prefilled with previous values
-- ⚠️ **Field Error Highlighting** - Invalid fields should be visually highlighted after failed submission
-- ⚠️ **Missing Logout Button** - No way to sign out currently (must reset database)
-- ⚠️ **Possible Session Bug** - Refreshing browser on Near Me screen may route back to Welcome screen
-- ⚠️ **Missing User Menu** - Need menu for logout and profile editing access
-
-**Post-MVP Enhancements (Future Phases):**
-- 📋 **Centralized Text Management** - All UI text (titles, labels, helper text) should be externalized (possibly database-backed) for easy updates
-- 📋 **Font Flexibility** - Switching fonts should only require theme changes, not widget edits
-- 📋 **Feed Scalability** - Current "fetch all, filter client-side" approach won't scale; need server-side spatial queries with pagination
-
-**Next Steps:**
-- ⏳ **Phase 6.1A** - Implement Playwright-based UI testing subagent (planned)
-- ❌ **Phase 6.2** - Main Feed Integration (wire feedNotifier, location services, like/unlike)
-- ❌ **Phase 6.3** - Point Creation Integration (GPS capture, Maidenhead calculation, real API calls)
-- ❌ **Phase 6.4** - Location Permission Flows (permission request UI and error states)
-- ❌ **Phase 6.5** - Phase 6 Cleanup (address known issues listed above)
-- ❌ **Phase 7+** - Real-Time Updates (Supabase Realtime for auto-updating feed)
-
-**Current Phase**: Phase 6.1 Complete → Phase 6.1A: Playwright Testing Agent Next
+- **Phase 6.2** - Main Feed Integration (wire feedNotifier, location services, like/unlike)
+- **Phase 6.3** - Point Creation Integration (GPS capture, Maidenhead, real API calls)
+- **Phase 6.4** - Location Permission Flows (permission request UI and error states)
+- **Phase 6.5** - Phase 6 Cleanup (address known issues above)
+- **Phase 7+** - Real-Time Updates (Supabase Realtime)
 
 ## Project Structure
 
@@ -483,101 +157,43 @@ Email/Password Sign In → Main Feed (profile already exists)
 │   ├── lib/
 │   │   ├── core/
 │   │   │   ├── config/          # Environment configuration
-│   │   │   ├── constants/       # App-wide constants (spacing, sizes, colors)
-│   │   │   ├── providers/       # Riverpod providers ✅ (27 total)
-│   │   │   │   ├── repository_providers.dart    # Repository providers (4 providers)
-│   │   │   │   ├── auth_providers.dart          # Authentication providers (6 providers)
-│   │   │   │   ├── location_providers.dart      # Location providers (6 providers)
-│   │   │   │   ├── profile_providers.dart       # Profile providers (4 providers)
-│   │   │   │   └── point_providers.dart         # Point/Feed/Like providers (16 providers)
-│   │   │   ├── services/        # Core services ✅
-│   │   │   │   ├── location_service.dart        # GPS and permission service (318 lines)
-│   │   │   │   └── LOCATION_SERVICES_README.md  # Location services documentation
-│   │   │   └── theme/           # Material 3 theme v3.0 (BLUE DOMINANCE)
+│   │   │   ├── constants/       # App-wide constants
+│   │   │   ├── providers/       # 27 Riverpod providers (5 files)
+│   │   │   ├── services/        # LocationService
+│   │   │   └── theme/           # Material 3 theme v3.0
 │   │   ├── presentation/
-│   │   │   ├── notifiers/       # State management notifiers ✅ (5 total, ~2,500 lines)
-│   │   │   │   ├── auth_notifier.dart           # Authentication state notifier (346 lines)
-│   │   │   │   ├── profile_notifier.dart        # Profile state notifier
-│   │   │   │   ├── point_drop_notifier.dart     # Point creation notifier
-│   │   │   │   ├── feed_notifier.dart           # Feed state notifier
-│   │   │   │   ├── like_notifier.dart           # Like/unlike notifier
-│   │   │   │   ├── README.md                    # Notifier usage documentation
-│   │   │   │   └── LIKE_NOTIFIER_README.md      # Like notifier detailed guide
-│   │   │   ├── screens/         # Auth, MainFeed, PointCreation screens
-│   │   │   └── widgets/         # Reusable PointCard component
-│   │   ├── domain/              # Domain layer (business logic)
-│   │   │   ├── utils/           # Geospatial calculation utilities ✅
-│   │   │   │   ├── maidenhead_converter.dart
-│   │   │   │   ├── haversine_calculator.dart
-│   │   │   │   └── distance_formatter.dart
-│   │   │   ├── value_objects/   # Immutable value objects ✅
-│   │   │   │   └── location_coordinate.dart
-│   │   │   ├── entities/        # Domain entities with Freezed ✅ (10 total)
-│   │   │   │   ├── profile.dart (+ .freezed.dart, .g.dart)             # User profile entity
-│   │   │   │   ├── point.dart (+ .freezed.dart, .g.dart)               # Location post entity
-│   │   │   │   ├── like.dart (+ .freezed.dart, .g.dart)                # Like relationship entity
-│   │   │   │   ├── auth_state.dart (+ .freezed.dart)                   # Authentication state model
-│   │   │   │   ├── profile_state.dart (+ .freezed.dart)                # Profile operation state
-│   │   │   │   ├── point_drop_state.dart (+ .freezed.dart)             # Point creation state
-│   │   │   │   ├── feed_state.dart (+ .freezed.dart)                   # Feed display state
-│   │   │   │   ├── like_state.dart (+ .freezed.dart)                   # Like/unlike state
-│   │   │   │   ├── location_permission_state.dart (+ .freezed.dart)    # Location permission states
-│   │   │   │   └── location_service_state.dart (+ .freezed.dart)       # Location service states
-│   │   │   ├── exceptions/      # Domain exceptions ✅
-│   │   │   │   └── repository_exceptions.dart
-│   │   │   ├── repositories/    # Repository interfaces ✅
-│   │   │   │   ├── i_points_repository.dart
-│   │   │   │   ├── i_profile_repository.dart
-│   │   │   │   └── i_likes_repository.dart
-│   │   │   └── use_cases/       # Business logic use cases ✅ (11 total)
-│   │   │       ├── profile_use_cases/    # CreateProfileUseCase, FetchProfileUseCase, UpdateProfileUseCase
-│   │   │       ├── point_use_cases/      # DropPointUseCase, FetchNearbyPointsUseCase, FetchUserPointsUseCase
-│   │   │       ├── like_use_cases/       # LikePointUseCase, UnlikePointUseCase, GetLikeCountUseCase
-│   │   │       ├── requests.dart         # 9 request DTOs (added UpdateProfileRequest)
-│   │   │       └── use_case_base.dart    # Abstract UseCase<Success, Request> base class
-│   │   └── data/                # Data layer ✅
-│   │       └── repositories/    # Supabase repository implementations ✅
-│   │           ├── supabase_profile_repository.dart    # Profile CRUD (274 lines)
-│   │           ├── supabase_points_repository.dart     # Point CRUD with PostGIS (335 lines)
-│   │           └── supabase_likes_repository.dart      # Like operations (306 lines)
-│   └── test/
-│       ├── widget_test.dart     # Basic widget test (1 test)
-│       ├── helpers/             # Test utilities ✅
-│       │   └── supabase_test_helper.dart    # Integration test helper
-│       ├── widget/              # Widget tests ✅
-│       │   └── point_card_test.dart    # PointCard component tests (20 tests)
-│       ├── domain/              # Domain layer tests ✅
-│       │   ├── utils/           # Geospatial utility tests (91 tests)
-│       │   ├── entities/        # Entity tests (73 tests: Profile, Point, Like, LocationPermissionState, LocationServiceState)
-│       │   └── use_cases/       # Use case tests (126 tests)
-│       │       ├── profile_use_cases/
-│       │       ├── point_use_cases/
-│       │       └── like_use_cases/
-│       └── data/                # Data layer integration tests ✅
-│           └── repositories/    # Repository integration tests (58 tests)
-│               ├── supabase_profile_repository_integration_test.dart    # 23 tests
-│               ├── supabase_points_repository_integration_test.dart     # 19 tests
-│               └── supabase_likes_repository_integration_test.dart      # 16 tests
+│   │   │   ├── notifiers/       # 5 state notifiers (~2,500 lines)
+│   │   │   ├── screens/         # Auth, MainFeed, PointCreation, ProfileCreation
+│   │   │   └── widgets/         # Reusable components (PointCard)
+│   │   ├── domain/              # Business logic
+│   │   │   ├── utils/           # Geospatial utilities (3)
+│   │   │   ├── value_objects/   # LocationCoordinate
+│   │   │   ├── entities/        # 10 domain entities
+│   │   │   ├── exceptions/      # 7 exception classes
+│   │   │   ├── repositories/    # 3 repository interfaces
+│   │   │   └── use_cases/       # 11 use cases
+│   │   └── data/                # Data layer
+│   │       └── repositories/    # 3 Supabase implementations
+│   └── test/                    # 396 tests
+│       ├── helpers/             # SupabaseTestHelper
+│       ├── widget/              # Widget tests
+│       ├── domain/              # Domain layer tests
+│       └── data/                # Integration tests
 ├── supabase/                     # Supabase configuration
 │   ├── config.toml              # Auth providers, API settings
-│   └── migrations/              # Database schema migrations (4 files)
-│       ├── 20251112143441_enable_postgis.sql
-│       ├── 20251112143459_create_profile_table.sql
-│       ├── 20251112143529_create_points_table.sql
-│       └── 20251112143615_create_likes_table.sql
-├── project_standards/            # Detailed specifications (source of truth)
+│   └── migrations/              # 4 SQL schema files
+├── project_standards/            # Specifications (source of truth)
 │   ├── architecture_and_state_management.md
 │   ├── api_strategy.md
-│   ├── AUTH_ARCHITECTURE.md     # Authentication architecture diagrams and flows
-│   ├── STATE_MANAGEMENT_IMPLEMENTATION.md    # Complete state management reference (73KB)
+│   ├── AUTH_ARCHITECTURE.md
+│   ├── STATE_MANAGEMENT_IMPLEMENTATION.md
 │   ├── product_requirements_document(PRD).md
 │   ├── tuPoint_data_schema.md
 │   ├── UX_user_flow.md
 │   ├── testing_strategy.md
-│   └── project-theme.md         # v3.0 - Aggressive Location Blue usage
+│   └── project-theme.md
 ├── general_standards/            # Flutter/UX best practices
-├── .claude/                      # Agents and commands
-└── .env.example                  # OAuth setup documentation
+└── .claude/                      # Agents and commands
 ```
 
 ## Development Commands
@@ -588,179 +204,141 @@ Email/Password Sign In → Main Feed (profile already exists)
 # Install dependencies
 cd app && flutter pub get
 
-# Run on connected device/emulator
-flutter run
+# Run app
+flutter run                                      # Default device
+flutter run -d chrome                           # Web
+flutter run -d macos                            # macOS
 
-# Run specific platform
-flutter run -d chrome          # Web
-flutter run -d macos           # macOS
-flutter run -d <device-id>     # Specific device
-
-# Run tests
-flutter test                    # All tests
-flutter test test/path/to/test_file.dart  # Single test
+# Tests
+flutter test                                     # All tests
+flutter test test/path/to/test_file.dart        # Single test
 
 # Build
-flutter build apk              # Android APK
-flutter build ios              # iOS (requires macOS)
-flutter build web              # Web build
+flutter build apk                                # Android
+flutter build web                                # Web
 
-# Code analysis
-flutter analyze                # Static analysis
-dart fix --apply              # Auto-fix lints
+# Analysis
+flutter analyze                                  # Static analysis
+dart fix --apply                                 # Auto-fix lints
 ```
 
 ### Supabase Commands
 
-**Local Development (Docker):**
-
 ```bash
-# Start Supabase services
-supabase start
+# Start/Stop
+supabase start                                   # Start Docker containers
+supabase stop                                    # Stop containers
 
-# Stop Supabase services
-supabase stop
+# Database
+supabase db reset                                # Reset + reapply migrations
+supabase migration new <name>                    # Create migration
+supabase status                                  # View status
+supabase logs -f                                 # View logs
 
-# Reset database (reapplies all migrations)
-supabase db reset
-
-# Create new migration
-supabase migration new <migration_name>
-
-# View status
-supabase status
-
-# View logs
-supabase logs -f
+# GUI
+# Open http://127.0.0.1:54323 for Supabase Studio
 ```
 
-**Supabase Studio (GUI):**
-- Open `http://127.0.0.1:54323` for visual database management
-- View tables, run SQL queries, inspect RLS policies
-
-**Custom slash commands for advanced operations:**
-
+**Custom slash commands:**
 ```bash
-/supabase-migration-assistant --create    # Create migration
-/supabase-schema-sync --pull             # Pull schema from Supabase
-/supabase-type-generator --all-tables    # Generate TypeScript types
-/supabase-security-audit --comprehensive  # Run security audit
-/supabase-data-explorer --inspect        # Explore database
-```
-
-**Note**: MCP tools require access token configuration. For local dev, use `supabase` CLI commands directly.
-
-### Theme Generation
-
-```bash
-/createThemeTemplate [requirements]       # Generate theme specification
+/supabase-migration-assistant --create           # Create migration
+/supabase-schema-sync --pull                     # Pull schema
+/supabase-type-generator --all-tables            # Generate types
+/supabase-security-audit --comprehensive         # Security audit
+/supabase-data-explorer --inspect                # Explore database
+/createThemeTemplate [requirements]              # Generate theme
 ```
 
 ## Visual Design: Theme v3.0 "BLUE DOMINANCE"
 
-The app uses an aggressively bold theme where **Location Blue (#3A9BFC) dominates every screen**. This is not a subtle accent color—blue is the defining visual characteristic.
-
-### Theme Characteristics
+**Location Blue (#3A9BFC) dominates every screen** - not a subtle accent, but the defining visual characteristic.
 
 **Light Theme - "BLUE IMMERSION":**
-- Background: `#D6EEFF` - Obviously blue, impossible to miss
-- Cards: `#F0F7FF` blue-tinted with **3dp solid blue borders**
-- Chips: `#99CCFF` - Saturated blue for Maidenhead codes
-- FAB: Location Blue with massive 24dp glow effect
-- Dividers: 30% opacity blue lines between cards
+- Background: `#D6EEFF` (obviously blue)
+- Cards: `#F0F7FF` with 3dp solid blue borders
+- Chips: `#99CCFF` (saturated blue)
+- FAB: Location Blue with 24dp glow
 
 **Dark Theme - "BLUE ELECTRIC":**
-- Background: `#0F1A26` - Dark with clear blue tint
-- Cards: `#1A2836` blue-tinted with **2dp glowing blue borders + aura effect**
-- Primary: `#66B8FF` - Brighter electric blue that glows
-- FAB: Dual-layer glow (24dp + 32dp blur) for maximum impact
-- Dividers: 40% opacity glowing blue lines
+- Background: `#0F1A26` (blue-tinted dark)
+- Cards: `#1A2836` with 2dp glowing borders + aura
+- Primary: `#66B8FF` (electric blue)
+- FAB: Dual-layer glow (24dp + 32dp)
 
-### Design Principles
+**Design Principles:**
+- 100% Theme Compliance (zero hardcoded values)
+- Constants-Driven (AppConstants)
+- WCAG 2.1 AA+ accessibility
+- Material 3
 
-1. **100% Theme Compliance**: Zero hardcoded colors, fonts, or sizes anywhere in presentation layer
-2. **Constants-Driven**: All spacing, sizes, and style values reference `AppConstants`
-3. **Accessibility First**: All combinations achieve WCAG 2.1 AA (most achieve AAA)
-4. **Material 3**: Uses latest Material Design components with proper theming
-
-### Key Files
-
-- **Theme Spec**: `project_standards/project-theme.md` (v3.0 with detailed color tables)
-- **Theme Implementation**: `app/lib/core/theme/app_theme.dart`
-- **Constants**: `app/lib/core/constants/app_constants.dart`
+**Key Files:**
+- `project_standards/project-theme.md` - Spec
+- `app/lib/core/theme/app_theme.dart` - Implementation
+- `app/lib/core/constants/app_constants.dart` - Constants
 
 ## Architecture
 
 ### Three-Layer Clean Architecture
 
-1. **Presentation Layer** (`lib/presentation/`)
-   - Flutter widgets, screens, view models
-   - Riverpod ConsumerWidgets for state consumption
+1. **Presentation** (`lib/presentation/`)
+   - Flutter widgets, screens
+   - Riverpod ConsumerWidgets
    - NO business logic in widgets
 
-2. **Domain Layer** (`lib/domain/`)
-   - Core business logic, entities, use cases
-   - Repository interfaces (contracts)
-   - Technology-agnostic (pure Dart, no Flutter dependencies)
-   - Examples: `Point`, `Profile`, `DropPointUseCase`, `ToggleLikeUseCase`
+2. **Domain** (`lib/domain/`)
+   - Entities, use cases, repository interfaces
+   - Pure Dart (no Flutter dependencies)
+   - Technology-agnostic
 
-3. **Data Layer** (`lib/data/`)
-   - Supabase client integration via PostgREST
-   - Repository implementations
-   - DTOs for API responses
+3. **Data** (`lib/data/`)
+   - Supabase repository implementations
+   - PostgREST integration
    - RLS-aware error handling
 
 ### State Management: Riverpod
 
-**Provider Types Used:**
+**Provider Types:**
 
 | Type | Purpose | Example |
 |------|---------|---------|
 | `Provider` | Read-only values | `pointsRepositoryProvider` |
-| `StateNotifierProvider` | Complex mutable state | `authProvider`, `pointDropNotifier` |
-| `FutureProvider` | Async operations | `allActivePointsFutureProvider` |
-| `StreamProvider` | Real-time data | `currentLocationProvider` |
+| `StateNotifierProvider` | Mutable state | `authNotifierProvider` |
+| `FutureProvider` | Async operations | `currentLocationProvider` |
+| `StreamProvider` | Real-time data | `locationStreamProvider` |
 
-**Key Data Flow Pattern:**
+**Data Flow:**
 ```dart
-// Providers watch and compose other providers
+// Providers compose other providers
 final nearbyPointsProvider = Provider((ref) {
-  final points = ref.watch(allActivePointsFutureProvider);
+  final points = ref.watch(allPointsProvider);
   final location = ref.watch(currentLocationProvider);
-  return points.when(
-    data: (pointList) => _filterByDistance(pointList, location),
-    // ...
-  );
+  return filterByDistance(points, location, 5000); // 5km
 });
 ```
 
 ## Backend: Supabase with RLS
 
-### API Strategy
+**API Strategy:**
+- PostgREST (auto-generated REST from PostgreSQL)
+- JWT authentication (Supabase Auth)
+- RLS policies enforce access control at DB level
+- Client-side defensive checks mirror RLS
 
-- **All API calls** use PostgREST (auto-generated REST API from PostgreSQL)
-- **Authentication**: JWT in Authorization header (Supabase Auth)
-- **Security**: Row Level Security (RLS) policies enforce access control at database level
-- **Client-side defensive checks**: Mirror RLS policies in repository code for transparency
-
-### Core Tables
+**Core Tables:**
 
 | Table | Purpose | Key Fields |
 |-------|---------|-----------|
 | `auth.users` | Supabase managed | id, email, metadata |
 | `profile` | User metadata | id (FK), username, bio |
-| `points` | Location posts | id, user_id (FK), content, geom (PostGIS), maidenhead_6char, is_active |
+| `points` | Location posts | id, user_id, content, geom (PostGIS), maidenhead_6char |
 | `likes` | Social interactions | point_id (FK), user_id (FK) |
 
-### Geospatial Features
-
-1. **PostGIS**: `geom` column stores POINT(lat, lon) in SRID 4326
-2. **Maidenhead Locator**: 6-character grid square format for generalized location display (~800m precision)
-3. **Client-Side Filtering**: 5km radius filtering done locally using Haversine formula (NOT PostGIS queries)
+**Geospatial:**
+- PostGIS GEOMETRY(POINT, 4326) for lat/lon
+- Maidenhead 6-char grid (~800m precision)
+- Client-side 5km filtering (Haversine)
 
 ## Specialized Agents
-
-Use these agents for domain-specific implementation:
 
 | Agent | When to Use |
 |-------|-------------|
@@ -768,68 +346,53 @@ Use these agents for domain-specific implementation:
 | `flutter-ui-builder` | UI screens from UX specs, widgets, layouts |
 | `flutter-data-architect` | Data models, DTOs, JSON serialization |
 | `backend-security-guard` | Supabase repositories, RLS enforcement |
-| `location-spatial-utility` | Maidenhead calculation, Haversine distance, geolocation |
-| `supabase-schema-architect` | Database schema design, migrations |
+| `location-spatial-utility` | Maidenhead, Haversine, geolocation |
+| `supabase-schema-architect` | Database schema, migrations |
 | `qa-testing-agent` | Test strategy, test implementation |
 
 ## Development Workflow
 
-### For New Features
+### New Features
+1. Update relevant `project_standards/` document
+2. Invoke appropriate specialized agent
+3. Follow architecture patterns
+4. Validate against specs
 
-1. **Update Specifications** → Modify relevant `project_standards/` document
-2. **Invoke Agent** → Use appropriate specialized agent for implementation
-3. **Follow Patterns** → Reference architecture documents
-4. **Test** → Validate against `testing_strategy.md` and `UX_user_flow.md`
-
-### For Database Changes
-
+### Database Changes
 1. Update `tuPoint_data_schema.md`
-2. Use `/supabase-migration-assistant --create [migration-name]`
-3. Update RLS policies in schema document
-4. Run `/supabase-security-audit --rls`
-5. Generate types if needed: `/supabase-type-generator`
+2. Create migration: `/supabase-migration-assistant --create`
+3. Update RLS policies in schema doc
+4. Run security audit: `/supabase-security-audit --rls`
 
-### For State Management Changes
-
-1. Review data flow in `architecture_and_state_management.md`
-2. Determine appropriate Riverpod provider type
+### State Management Changes
+1. Review `architecture_and_state_management.md`
+2. Determine provider type
 3. Use `state-management-architect` agent
-4. Implement use cases in domain layer first
-5. Wire into presentation layer via ConsumerWidget
+4. Implement use cases first
+5. Wire to presentation via ConsumerWidget
 
 ## Key Architectural Decisions
 
-1. **Specification-First Development**: All features begin with specification documents in `project_standards/`. Agents implement based on specs.
-
-2. **Client-Side Geospatial Filtering**: Server returns all active points; client calculates Haversine distance locally (5km radius). Keeps logic testable and reduces server complexity.
-
-3. **PostgREST + RLS Security Model**: No custom backend services. Security enforced by PostgreSQL RLS policies. Client code adds defensive checks that mirror RLS.
-
-4. **Maidenhead Grid Locators**: Unique use of ham radio grid square system for approximate location display without revealing exact coordinates.
-
-5. **Agent-Based Development**: Each architectural domain has a specialized agent that encapsulates deep expertise and ensures consistent implementation patterns.
+1. **Specification-First** - All features start with `project_standards/` docs
+2. **Client-Side Geospatial** - 5km filtering via Haversine (not server-side PostGIS queries)
+3. **RLS Security** - No custom backend; PostgreSQL RLS enforces access control
+4. **Maidenhead Grids** - Ham radio locators for approximate location display
+5. **Agent-Based Development** - Specialized agents ensure consistent patterns
 
 ## MVP Constraints
 
-- **Single main loop**: Sign up → Drop Point → View Nearby Points
-- **5km default radius** for feed display (not configurable in MVP)
-- **Client-side filtering** only (no complex server-side spatial queries)
-- **Basic profile**: username + optional bio only
-- **No chat, moderation, or real-time features** in MVP
-
-## Build-Measure-Learn Cycle
-
-The MVP goal is to prove assumptions. Future analytics should measure:
-- **Activation**: % users who drop a Point within 24 hours of sign-up
-- **Retention**: Day 7 retention rate
-- **Engagement**: Average Points Liked per session
+- Single main loop: Sign up → Drop Point → View Nearby
+- 5km fixed radius (not configurable)
+- Client-side filtering only
+- Basic profile (username + bio)
+- No chat, moderation, or real-time in MVP
 
 ## Important Notes
 
-- **Always reference specification documents** in `project_standards/` before implementing features
-- **Use agents proactively** - they embody best practices and architectural patterns
-- **RLS policies are enforced server-side** but should be mirrored in client code for better error messages
-- **All coordinates** use WGS84 (SRID 4326)
-- **Client filters for 5km radius** - do not rely on PostGIS server-side spatial queries
-- **Specifications are source of truth** - update specs before implementing features
-- **See branching policy above** - always verify branch before making changes
+- **Always reference specifications** in `project_standards/` before implementing
+- **Use agents proactively** - they embody best practices
+- **RLS enforced server-side** but mirrored in client for better errors
+- **All coordinates use WGS84** (SRID 4326)
+- **Client filters 5km radius** - don't rely on PostGIS server queries
+- **Specs are source of truth** - update before implementing
+- **Check git branch** - see branching policy above
