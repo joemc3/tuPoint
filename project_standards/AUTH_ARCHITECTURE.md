@@ -7,13 +7,21 @@
 │                          Presentation Layer                          │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                       │
-│  ┌──────────────────┐         ┌──────────────────┐                  │
-│  │  LoginScreen     │         │  SignUpScreen    │                  │
-│  │  (Widget)        │         │  (Widget)        │                  │
-│  └────────┬─────────┘         └────────┬─────────┘                  │
-│           │                            │                             │
-│           │ ref.watch/read             │ ref.watch/read              │
-│           ▼                            ▼                             │
+│  ┌──────────────────────────────────────────────────────┐            │
+│  │              AuthGateScreen                          │            │
+│  │           (ConsumerWidget - Root Router)             │            │
+│  │                                                       │            │
+│  │  Routes based on authState:                          │            │
+│  │  • unauthenticated → _LoginScreen                    │            │
+│  │  • authenticated(hasProfile=false) →                 │            │
+│  │      ProfileCreationScreen                           │            │
+│  │  • authenticated(hasProfile=true) → MainFeedScreen   │            │
+│  │  • loading → _LoadingScreen                          │            │
+│  │  • error → _ErrorScreen                              │            │
+│  └──────────────────────┬───────────────────────────────┘            │
+│                         │                                            │
+│                         │ watches authStateProvider                 │
+│                         ▼                                            │
 │  ┌────────────────────────────────────────────────┐                 │
 │  │        authNotifierProvider                    │                 │
 │  │        StateNotifierProvider<AuthNotifier,     │                 │
@@ -30,7 +38,9 @@
 │  │  • signInWithEmail(email, password)                     │        │
 │  │  • signInWithGoogle()                                   │        │
 │  │  • signInWithApple()                                    │        │
-│  │  • signUp(email, password, username, bio)               │        │
+│  │  • signUp(email, password, username, bio) [LEGACY]      │        │
+│  │  • signUpEmailOnly(email, password) [NEW]               │        │
+│  │  • completeProfile(userId, username, bio) [NEW]         │        │
 │  │  • signOut()                                             │        │
 │  │  • checkAuthStatus()                                    │        │
 │  │                                                          │        │
@@ -155,19 +165,22 @@
 
 ## Sign Up Flow with Profile Creation
 
+### Modern Flow (Email/Password + OAuth Consistent)
+
+**Step 1: Create Auth Account Only**
 ```
 User clicks "Sign Up"
          │
          ▼
 ┌─────────────────────────────────────────────┐
-│  authNotifier.signUp(                       │
-│    email, password, username, bio           │
+│  authNotifier.signUpEmailOnly(              │
+│    email, password                          │
 │  )                                          │
 └────────┬────────────────────────────────────┘
          │
          ▼
 ┌─────────────────────────────────────────────┐
-│  Step 1: Create Auth Account                │
+│  Create Auth Account                        │
 │  supabase.auth.signUp(email, password)      │
 └────────┬────────────────────────────────────┘
          │
@@ -177,29 +190,71 @@ User clicks "Sign Up"
                                   │    │
                                   │    ▼
                                   │ ┌──────────────────────────────────┐
-                                  │ │  Step 2: Create Profile          │
-                                  │ │  createProfileUseCase(           │
-                                  │ │    userId, username, bio         │
-                                  │ │  )                               │
-                                  │ └────────┬─────────────────────────┘
-                                  │          │
-                                  │          ├───► Success ────────────┐
-                                  │          │                          │
-                                  │          ├───► DuplicateUsername   │
-                                  │          │          │               │
-                                  │          └───► ValidationError     │
-                                  │                     │               │
-                                  │                     │               │
-                                  ▼                     ▼               ▼
-                           ┌─────────────┐   ┌──────────────────┐  ┌──────────────────┐
-                           │   Error     │   │  Authenticated   │  │  Authenticated   │
-                           │  (message)  │   │  (userId,        │  │  (userId,        │
-                           └─────────────┘   │   hasProfile:    │  │   hasProfile:    │
-                                             │   false)         │  │   true)          │
-                                             │                  │  └──────────────────┘
-                                             │  +               │
-                                             │  Error(message)  │
-                                             └──────────────────┘
+                                  │ │  Set State:                      │
+                                  │ │  Authenticated(userId,           │
+                                  │ │    hasProfile: false)            │
+                                  │ │                                  │
+                                  │ │  → Routes to ProfileCreation     │
+                                  │ │     Screen                       │
+                                  │ └──────────────────────────────────┘
+                                  │
+                                  ▼
+                           ┌─────────────┐
+                           │   Error     │
+                           │  (message)  │
+                           └─────────────┘
+```
+
+**Step 2: Complete Profile (User interaction on ProfileCreationScreen)**
+```
+User enters username and bio, clicks "Done"
+         │
+         ▼
+┌─────────────────────────────────────────────┐
+│  authNotifier.completeProfile(              │
+│    userId, username, bio                    │
+│  )                                          │
+└────────┬────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────┐
+│  Create Profile                             │
+│  createProfileUseCase(userId, username,     │
+│    bio)                                     │
+└────────┬────────────────────────────────────┘
+         │
+         ├───► Success ────────────────────────┐
+         │                                      │
+         ├───► DuplicateUsername                │
+         │          │                           │
+         └───► ValidationError                  │
+                    │                           │
+                    ▼                           ▼
+          ┌──────────────────┐        ┌──────────────────┐
+          │  Authenticated   │        │  Authenticated   │
+          │  (userId,        │        │  (userId,        │
+          │   hasProfile:    │        │   hasProfile:    │
+          │   false)         │        │   true)          │
+          │                  │        │                  │
+          │  +               │        │  → Routes to     │
+          │  Error(message)  │        │     MainFeed     │
+          └──────────────────┘        └──────────────────┘
+```
+
+### Legacy Flow (Direct Sign Up with Username)
+
+**Note**: The `signUp(email, password, username, bio)` method still exists for programmatic use but is not used by the UI. It creates both auth account and profile in a single operation.
+
+```
+authNotifier.signUp(email, password, username, bio)
+         │
+         ├───► Step 1: Create Auth Account
+         │
+         └───► Step 2: Create Profile (automatic)
+                    │
+                    ├───► Success → Authenticated(hasProfile: true)
+                    │
+                    └───► Error → Authenticated(hasProfile: false) + Error
 ```
 
 ## Provider Dependency Graph

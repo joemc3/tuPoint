@@ -1,6 +1,6 @@
 # tuPoint (tP.2)
 
-**The anti-social media app where content disappears when you leave the area.**
+**what's your point?** - The anti-social media app where content disappears when you leave the area.
 
 ## What is tuPoint?
 
@@ -12,7 +12,15 @@ Every feature must reinforce this hyper-local, ephemeral nature. Content lives a
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Complete → **State Management COMPLETE** (Phase 5.1-5.4) → **Integration Test Fixes COMPLETE** (Phase 5.6) → UI Integration Next
+**Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Complete → State Management COMPLETE → Integration Test Fixes COMPLETE → **Phase 6.1: Authentication UI COMPLETE** → Phase 6.1A: Playwright Testing Next
+
+**Latest Updates (2025-11-14):**
+- ✅ **Phase 6.1 Complete**: Full authentication flow integrated with email/password + OAuth support
+  - AuthGateScreen with state-driven routing (387 lines)
+  - ProfileCreationScreen for post-auth username collection (212 lines)
+  - Session persistence across app restarts
+  - User-friendly error handling with snackbars
+  - Tagline updated to "what's your point?" for better brand engagement
 
 ## Codebase Statistics
 
