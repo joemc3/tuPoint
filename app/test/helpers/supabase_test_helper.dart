@@ -13,8 +13,11 @@ class SupabaseTestHelper {
   static const String supabaseUrl = 'http://127.0.0.1:54321';
   static const String supabaseAnonKey =
       'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH';
+  static const String supabaseServiceRoleKey =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU';
 
   static SupabaseClient? _client;
+  static SupabaseClient? _adminClient;
   static bool _initialized = false;
 
   /// Get or create the Supabase client for tests.
@@ -25,6 +28,17 @@ class SupabaseTestHelper {
       );
     }
     return _client!;
+  }
+
+  /// Get admin client with service role key (bypasses RLS).
+  /// Used for test cleanup operations.
+  static SupabaseClient get adminClient {
+    if (_adminClient == null) {
+      throw StateError(
+        'SupabaseTestHelper not initialized. Call initialize() first.',
+      );
+    }
+    return _adminClient!;
   }
 
   /// Initialize Supabase for integration tests.
@@ -42,6 +56,13 @@ class SupabaseTestHelper {
     );
 
     _client = Supabase.instance.client;
+
+    // Initialize admin client with service role key for cleanup operations
+    _adminClient = SupabaseClient(
+      supabaseUrl,
+      supabaseServiceRoleKey,
+    );
+
     _initialized = true;
   }
 
@@ -59,18 +80,24 @@ class SupabaseTestHelper {
       // 2. points (references profile)
       // 3. profile (references auth.users)
       //
-      // Use gte to delete all records (workaround for RLS in test environment)
-      // In production, never expose these operations!
+      // Use admin client with service role key to bypass RLS policies
+      // This ensures all test data is properly cleaned up between runs
 
-      await client.from('likes').delete().gte('created_at', '2000-01-01');
-      await client.from('points').delete().gte('created_at', '2000-01-01');
-      await client.from('profile').delete().gte('created_at', '2000-01-01');
+      await adminClient.from('likes').delete().gte('created_at', '2000-01-01');
+      await adminClient.from('points').delete().gte('created_at', '2000-01-01');
+      await adminClient.from('profile').delete().gte('created_at', '2000-01-01');
+
+      // Note: We don't delete from auth.users because:
+      // 1. Profile deletion cascades via ON DELETE CASCADE
+      // 2. Auth users can be reused across test runs
+      // 3. Deleting auth.users requires admin API, not just service role
     } catch (e) {
-      // Ignore cleanup errors - they may be due to RLS or missing data
-      print('Warning: Cleanup encountered error (this may be normal): $e');
+      // Log cleanup errors but don't fail tests
+      print('Warning: Cleanup encountered error: $e');
     }
 
-    // Sign out any authenticated user
+    // Sign out to reset auth state between tests
+    // This prevents auth state conflicts when tests create different users
     await client.auth.signOut();
   }
 
@@ -100,6 +127,10 @@ class SupabaseTestHelper {
 
       // In local development, users should be auto-confirmed
       // If not, you may need to manually confirm them in the database
+
+      // Delay to ensure auth state is fully synchronized with database RLS
+      // This is especially important after sign out/sign in cycles
+      await Future.delayed(Duration(milliseconds: 500));
 
       return userId;
     } catch (e) {
