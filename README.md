@@ -152,8 +152,8 @@ The domain repository contracts are now defined:
 - ✅ **Error mapping** - PostgrestException → domain exceptions (UnauthorizedException, NotFoundException, ValidationException, etc.)
 - ✅ **PostGIS integration** - WKT format for writes, GeoJSON for reads, automatic conversion
 - ✅ **Test helper** - SupabaseTestHelper for setup, cleanup, and test user management
-- ✅ **Test coverage** - From 287 tests → 345 tests (+58 integration tests, +20% increase)
-- ✅ **Pass rate** - 331/345 passing (96.0%)
+- ✅ **Test coverage** - From 287 tests → 345 tests → 396 tests (after security remediation: +51 tests)
+- ✅ **Pass rate** - 386/396 passing (97.5%)
 
 **Data layer is now complete and ready for state management wiring.**
 
@@ -242,18 +242,48 @@ The domain repository contracts are now defined:
 
 **State management is now complete and ready for UI integration.**
 
+### Phase 5.5: Post-Rebase Fixes ✅ COMPLETE
+
+**Security Remediation Integration & Test Fixes (2025-11-14):**
+
+After merging security remediation branch to main and rebasing feature/profile-point-state:
+
+- ✅ **Security remediation merge** - Integrated security fixes from main branch:
+  - InputSanitizer utility (147 lines, Unicode-aware validation)
+  - Enhanced password policy (requires lowercase + uppercase + digits)
+  - HTTPS enforcement for Android
+  - Environment validation improvements
+  - 27 new security tests (InputSanitizer validation)
+
+- ✅ **Test coordinate fixes** - Fixed FetchNearbyPointsUseCase tests:
+  - Root cause: Test coordinates were incorrectly labeled (claimed ~2km, actually 5.31km away)
+  - Fixed 6 test methods in fetch_nearby_points_use_case_test.dart with mathematically correct coordinates
+  - Used HaversineCalculator.calculateDestination() to generate precise test points
+  - All 17 FetchNearbyPointsUseCase tests now passing
+
+- ✅ **Integration test password updates** - Updated test passwords for new security policy:
+  - Changed from `password123` to `TestPass123` in 3 integration test files
+  - Meets new requirements: lowercase + uppercase + digits
+
+**Test Coverage After Rebase:**
+- **Total**: 396 tests (369 original + 27 security tests)
+- **Passing**: 386/396 (97.5% pass rate)
+- **Breakdown**: 91 utils + 73 entities + 143 use cases + 21 widgets + 58 integration + 27 security
+- **Remaining issues**: 10 integration test isolation issues (not blocking)
+
 ### Next Phase: UI Integration & Testing 🚧
 
 Ready to implement (Phase 6+):
+- ⚠️ **Fix integration test isolation** - Resolve 10 remaining integration test failures (test cleanup issues)
 - ❌ **UI Integration** - Wire state providers into Auth Gate, Main Feed, Point Creation screens
 - ❌ **Permission flows** - Add location permission request UI
 - ❌ **Testing** - Unit tests for notifiers, integration tests for providers
-- ❌ **Real-time updates** - Integrate Supabase Realtime for auto-updating feed
+- ❌ **Real-Time updates** - Integrate Supabase Realtime for auto-updating feed
 - ❌ **Error display** - Implement user-friendly error messages throughout UI
 
 **Quick Start:**
 - Run `flutter run` in the `app/` directory to see the UI mockup
-- Run `flutter test` to run all 369 tests (91 utils + 73 entities + 126 use cases + 21 widgets + 58 integration)
+- Run `flutter test` to run all 396 tests (386 passing, 10 with isolation issues)
 - Run `supabase start` to launch the local database environment
 
 ## Tech Stack

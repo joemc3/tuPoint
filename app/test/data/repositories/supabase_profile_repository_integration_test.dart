@@ -36,7 +36,7 @@ void main() {
         // Arrange: Create and authenticate a test user
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-create@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
 
         // Act: Create profile
@@ -57,7 +57,7 @@ void main() {
         // Arrange
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-nobio@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
 
         // Act
@@ -92,7 +92,7 @@ void main() {
         // Arrange: Create user A
         await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'usera@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
 
         // Act & Assert: Try to create profile for user B
@@ -109,7 +109,7 @@ void main() {
         // Arrange
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-emptyusername@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
 
         // Act & Assert
@@ -127,7 +127,7 @@ void main() {
         // Arrange: Create first user with username
         final userId1 = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'user1@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await repository.createProfile(
           id: userId1,
@@ -138,7 +138,7 @@ void main() {
         await SupabaseTestHelper.signOutTestUser();
         final userId2 = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'user2@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
 
         // Act & Assert: Try to create profile with same username
@@ -157,7 +157,7 @@ void main() {
         // Arrange: Create a profile
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-fetch@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await repository.createProfile(
           id: userId,
@@ -178,7 +178,7 @@ void main() {
         // Arrange: Create authenticated user (needed for SELECT RLS)
         await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-auth@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
 
         // Act & Assert
@@ -194,7 +194,7 @@ void main() {
         // Arrange
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-username@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await repository.createProfile(
           id: userId,
@@ -215,7 +215,7 @@ void main() {
         // Arrange: Create authenticated user
         await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-auth2@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
 
         // Act & Assert
@@ -231,21 +231,21 @@ void main() {
         // Arrange: Create multiple profiles
         final userId1 = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'user1-all@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await repository.createProfile(id: userId1, username: 'user1');
 
         await SupabaseTestHelper.signOutTestUser();
         final userId2 = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'user2-all@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await repository.createProfile(id: userId2, username: 'user2');
 
         await SupabaseTestHelper.signOutTestUser();
         final userId3 = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'user3-all@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await repository.createProfile(id: userId3, username: 'user3');
 
@@ -264,7 +264,7 @@ void main() {
         // Arrange: Create authenticated user but no profile
         await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-empty@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
 
         // Act
@@ -280,7 +280,7 @@ void main() {
         // Arrange: Create profile
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-update@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await repository.createProfile(
           id: userId,
@@ -305,7 +305,7 @@ void main() {
         // Arrange
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-updatebio@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await repository.createProfile(
           id: userId,
@@ -328,7 +328,7 @@ void main() {
         // Arrange
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-updateboth@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await repository.createProfile(
           id: userId,
@@ -352,7 +352,7 @@ void main() {
         // Arrange
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-noupdate@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await repository.createProfile(
           id: userId,
@@ -388,7 +388,7 @@ void main() {
         // Arrange: Create user A
         await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'usera-update@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
 
         // Act & Assert: Try to update profile for user B
@@ -405,7 +405,7 @@ void main() {
         // Arrange
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-emptyupdate@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await repository.createProfile(id: userId, username: 'oldname');
 
@@ -424,14 +424,14 @@ void main() {
         // Arrange: Create two users
         final userId1 = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'user1-dup@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await repository.createProfile(id: userId1, username: 'existinguser');
 
         await SupabaseTestHelper.signOutTestUser();
         final userId2 = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'user2-dup@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await repository.createProfile(id: userId2, username: 'anotheruser');
 

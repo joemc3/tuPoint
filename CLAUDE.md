@@ -59,13 +59,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Domain Exceptions**: 7 exception classes
 - **Supabase Migrations**: 4 SQL schema files
 - **RLS Policies**: 10 security policies (profile: 4, points: 3, likes: 3)
-- **Test Coverage**: 369 comprehensive tests (~3,245 lines)
+- **Test Coverage**: 396 comprehensive tests (~3,500 lines) including security tests
   - ✅ **Domain Utilities**: 91 tests
   - ✅ **Domain Entities**: 73 tests (Profile: 25, Point: 16, Like: 8, LocationPermissionState: 9, LocationServiceState: 15)
-  - ✅ **Domain Use Cases**: 126 tests
+  - ✅ **Domain Use Cases**: 143 tests (includes 17 FetchNearbyPointsUseCase tests - fixed after rebase)
   - ✅ **Widget Tests**: 21 tests (PointCard: 20, smoke test: 1)
   - ✅ **Integration Tests**: 58 tests (repository implementations with real database)
-- **Test Pass Rate**: 355/369 passing (96.2%)
+  - ✅ **Security Tests**: 27 tests (InputSanitizer utility added in security remediation)
+- **Test Pass Rate**: 386/396 passing (97.5%) - 10 integration test isolation issues remaining
 - **Specialized AI Agents**: 8 agents for architecture domains
 - **Specification Documents**: 9 comprehensive spec files in `project_standards/` (including AUTH_ARCHITECTURE.md, STATE_MANAGEMENT_IMPLEMENTATION.md)
 - **Theme Variants**: 2 modes (Light "BLUE IMMERSION", Dark "BLUE ELECTRIC")
@@ -153,12 +154,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ **SupabaseLikesRepository Tests** - 16 tests (like/unlike, counts, duplicate prevention)
 - ✅ **Test Helper** - SupabaseTestHelper for integration test setup, cleanup, and auth
 
-**Total Test Coverage**: 345 comprehensive tests (96.0% pass rate)
+**Total Test Coverage**: 396 comprehensive tests (97.5% pass rate)
 - ✅ Domain Utilities: 91 tests
-- ✅ Domain Entities: 49 tests
-- ✅ Domain Use Cases: 126 tests
+- ✅ Domain Entities: 73 tests (includes LocationPermissionState and LocationServiceState)
+- ✅ Domain Use Cases: 143 tests (includes FetchNearbyPointsUseCase - 17 tests)
 - ✅ Widget Tests: 21 tests
-- ✅ Integration Tests: 58 tests (real database)
+- ✅ Integration Tests: 58 tests (real database) - 10 with isolation issues pending fix
+- ✅ Security Tests: 27 tests (InputSanitizer utility)
 
 **State Management Layer (Phase 5): ✅ COMPLETE**
 
@@ -256,14 +258,37 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **27 Providers**: Across 5 provider files (repository, auth, location, profile, point/feed/like)
 - **11 Use Cases**: All wired into state layer
 
+**Post-Rebase Fixes (Phase 5.5): ✅ COMPLETE**
+
+After merging security remediation branch to main, rebased feature/profile-point-state and fixed issues:
+
+- ✅ **Security Remediation Merge** - Integrated security fixes from main branch
+  - InputSanitizer utility (147 lines, Unicode-aware validation)
+  - Enhanced password policy (requires lowercase + uppercase + digits)
+  - HTTPS enforcement for Android
+  - Environment validation improvements
+  - 27 new security tests
+
+- ✅ **Test Coordinate Fixes** - Fixed FetchNearbyPointsUseCase tests (test/domain/use_cases/point_use_cases/fetch_nearby_points_use_case_test.dart:58-519)
+  - Root cause: Test coordinates were incorrectly labeled (claimed ~2km, actually 5.31km)
+  - Fixed 6 test methods with correct coordinates using HaversineCalculator.calculateDestination()
+  - All 17 FetchNearbyPointsUseCase tests now passing
+
+- ✅ **Integration Test Password Updates** - Updated test passwords for new security policy
+  - Changed from `password123` to `TestPass123` in 3 integration test files
+  - supabase_profile_repository_integration_test.dart
+  - supabase_points_repository_integration_test.dart
+  - supabase_likes_repository_integration_test.dart
+
 **Next Steps (Phase 6+):**
+- ⚠️ **Fix Integration Test Isolation** - Resolve 10 remaining integration test failures (test cleanup/isolation issues)
 - ❌ **UI Integration** - Wire state providers into Auth Gate, Main Feed, Point Creation screens
 - ❌ **Permission Flows** - Add location permission request UI
 - ❌ **Testing** - Unit tests for notifiers, integration tests for providers
 - ❌ **Real-Time Updates** - Integrate Supabase Realtime for auto-updating feed
 - ❌ **Error Display** - Implement user-friendly error messages throughout UI
 
-**Current Phase**: State Management Complete (Phase 5.1-5.4) → UI Integration Next
+**Current Phase**: Post-Rebase Fixes Complete → Integration Test Fixes → UI Integration Next
 
 ## Project Structure
 
