@@ -287,6 +287,95 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// Sign up with email and password only (no profile creation).
+  ///
+  /// This creates a Supabase auth account but does NOT create a profile.
+  /// The user will be set to authenticated(hasProfile: false), which routes
+  /// them to the ProfileCreationScreen to complete their profile setup.
+  ///
+  /// This flow is consistent with OAuth sign-in, where profile creation
+  /// happens separately after authentication.
+  ///
+  /// Parameters:
+  /// - [email]: User's email address
+  /// - [password]: User's password (min 6 characters by Supabase default)
+  Future<void> signUpEmailOnly({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      state = const AuthState.loading();
+
+      // Create auth account only (no profile)
+      final response = await _supabaseClient.auth.signUp(
+        email: email.trim(),
+        password: password,
+      );
+
+      if (response.session == null || response.user == null) {
+        state = const AuthState.error(
+          message: 'Sign up failed. Please try again.',
+        );
+        return;
+      }
+
+      final userId = response.user!.id;
+
+      // Set state to authenticated without profile
+      // User will be routed to ProfileCreationScreen
+      state = AuthState.authenticated(userId: userId, hasProfile: false);
+    } on AuthException catch (e) {
+      state = AuthState.error(message: _mapAuthExceptionToMessage(e));
+    } catch (e) {
+      state = AuthState.error(
+        message: 'An unexpected error occurred during sign up.',
+      );
+    }
+  }
+
+  /// Complete profile creation for an already-authenticated user.
+  ///
+  /// This is called after OAuth sign-in (Google/Apple) when the user
+  /// doesn't have a profile yet. The user is already authenticated via
+  /// OAuth, so we just need to create the profile record.
+  ///
+  /// Throws [DuplicateUsernameException] if username is taken.
+  /// Throws [ValidationException] if username format is invalid.
+  Future<void> completeProfile({
+    required String userId,
+    required String username,
+    String? bio,
+  }) async {
+    try {
+      state = const AuthState.loading();
+
+      // Create profile for authenticated user
+      await _createProfileUseCase(CreateProfileRequest(
+        userId: userId,
+        username: username,
+        bio: bio,
+      ));
+
+      // Success! User now has a complete profile
+      state = AuthState.authenticated(userId: userId, hasProfile: true);
+    } on DuplicateUsernameException catch (e) {
+      // Username is taken - stay authenticated but show error
+      state = AuthState.authenticated(userId: userId, hasProfile: false);
+      // Immediately transition to error state to show message
+      state = AuthState.error(message: e.message);
+    } on ValidationException catch (e) {
+      // Invalid username format - stay authenticated but show error
+      state = AuthState.authenticated(userId: userId, hasProfile: false);
+      state = AuthState.error(message: e.message);
+    } catch (e) {
+      // Other error - stay authenticated but show error
+      state = AuthState.authenticated(userId: userId, hasProfile: false);
+      state = AuthState.error(
+        message: 'Failed to create profile. Please try again.',
+      );
+    }
+  }
+
   /// Sign out the current user.
   ///
   /// Clears the Supabase session and resets to unauthenticated state.

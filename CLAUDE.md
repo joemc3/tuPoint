@@ -380,14 +380,99 @@ Both tests involve `deactivatePoint` operation and fail with RLS errors in the t
 
 Root cause: Rapid sign-out/sign-in cycles in test environment cause auth state synchronization issues with database RLS layer. Production code works correctly (verified by other UPDATE operations like `updatePointContent` succeeding). These are test environment conditions, not production bugs.
 
-**Next Steps (Phase 6+):**
-- ❌ **UI Integration** - Wire state providers into Auth Gate, Main Feed, Point Creation screens
-- ❌ **Permission Flows** - Add location permission request UI
-- ❌ **Testing** - Unit tests for notifiers, integration tests for providers
-- ❌ **Real-Time Updates** - Integrate Supabase Realtime for auto-updating feed
-- ❌ **Error Display** - Implement user-friendly error messages throughout UI
+**UI Integration (Phase 6): ⏳ IN PROGRESS**
 
-**Current Phase**: Integration Test Fixes Complete → UI Integration Next
+**Phase 6.1: Authentication Flow (✅ COMPLETE - 2025-11-14)**
+
+Integrated complete authentication system with state-driven routing and profile creation flow.
+
+**UI Components Created:**
+- ✅ **AuthGateScreen** - Root router with state-based navigation (325 lines)
+  - ConsumerWidget watching authStateProvider
+  - Routes to appropriate screen based on auth state
+  - 4 internal screens: _LoginScreen, _LoadingScreen, _ErrorScreen, MainFeedScreen
+- ✅ **_LoginScreen** - Email/password authentication form (217 lines)
+  - Sign in mode: Email + password
+  - Sign up mode: Email + password (no username - collected later)
+  - Toggle between sign in/sign up modes
+  - OAuth buttons (disabled - for future configuration)
+  - Loading states on buttons
+  - Error snackbars for auth failures
+- ✅ **ProfileCreationScreen** - Username/bio collection (212 lines)
+  - Shown after sign up or OAuth (when hasProfile = false)
+  - Username validation (3-20 chars, alphanumeric + underscore)
+  - Optional bio field (max 280 chars)
+  - Calls authNotifier.completeProfile()
+
+**AuthNotifier Enhancements:**
+- ✅ **signUpEmailOnly()** - New method for email/password sign up (44 lines)
+  - Creates auth account ONLY (no profile creation)
+  - Sets state to authenticated(hasProfile: false)
+  - Routes user to ProfileCreationScreen
+- ✅ **completeProfile()** - Post-auth profile creation (42 lines)
+  - For OAuth and email/password sign-up users
+  - Creates profile record via CreateProfileUseCase
+  - Handles duplicate username and validation errors
+
+**Authentication Flow:**
+```
+Email/Password Sign Up → Profile Creation Screen → Main Feed
+      OAuth Sign In → Profile Creation Screen → Main Feed
+Email/Password Sign In → Main Feed (profile already exists)
+```
+
+**Key Features:**
+- ✅ Consistent flow for all auth methods (email/password + OAuth)
+- ✅ State-driven routing (zero manual navigation)
+- ✅ Session persistence across app restarts
+- ✅ User-friendly error messages (snackbars)
+- ✅ Loading indicators during async operations
+- ✅ Form validation (email, password, username)
+- ✅ Theme v3.0 "BLUE DOMINANCE" applied throughout
+
+**Files Modified:**
+- `app/lib/presentation/screens/auth_gate_screen.dart` - Complete rewrite (387 lines)
+- `app/lib/presentation/notifiers/auth_notifier.dart` - Added signUpEmailOnly() and completeProfile()
+- `app/lib/presentation/screens/profile_creation_screen.dart` - New file (212 lines)
+
+**Documentation Updated:**
+- ✅ `project_standards/UX_user_flow.md` - Added email/password flow, updated Screen 1 and Screen 2
+- ✅ `project_standards/AUTH_ARCHITECTURE.md` - Updated component diagram, added modern flow diagrams
+- ✅ Comprehensive testing guide created (6 test suites, 28 test cases)
+
+**UX Refinements:**
+- ✅ **Tagline Changed** - From "Content disappears when you leave the area" to "what's your point?" (more engaging, punny)
+  - Updated in `auth_gate_screen.dart:123`
+  - Updated in `UX_user_flow.md:28`
+
+**Testing Status:**
+- Manual testing recommended (see testing guide above)
+- Covers: sign up, sign in, session persistence, validation, error handling, UI/UX verification
+
+**Known Issues to Address (Phase 6 Cleanup - End of Phase 6):**
+- ⚠️ **Theme Consistency** - Some fonts/sizes set directly in widgets instead of from theme/constants
+- ⚠️ **Password Validation** - Should allow common special characters (!, @, #, $, %, etc.)
+- ⚠️ **In-Form Validation** - Password and email validation should happen on input, not on submit
+- ⚠️ **Form State Persistence** - After submission error, form should be prefilled with previous values
+- ⚠️ **Field Error Highlighting** - Invalid fields should be visually highlighted after failed submission
+- ⚠️ **Missing Logout Button** - No way to sign out currently (must reset database)
+- ⚠️ **Possible Session Bug** - Refreshing browser on Near Me screen may route back to Welcome screen
+- ⚠️ **Missing User Menu** - Need menu for logout and profile editing access
+
+**Post-MVP Enhancements (Future Phases):**
+- 📋 **Centralized Text Management** - All UI text (titles, labels, helper text) should be externalized (possibly database-backed) for easy updates
+- 📋 **Font Flexibility** - Switching fonts should only require theme changes, not widget edits
+- 📋 **Feed Scalability** - Current "fetch all, filter client-side" approach won't scale; need server-side spatial queries with pagination
+
+**Next Steps:**
+- ⏳ **Phase 6.1A** - Implement Playwright-based UI testing subagent (planned)
+- ❌ **Phase 6.2** - Main Feed Integration (wire feedNotifier, location services, like/unlike)
+- ❌ **Phase 6.3** - Point Creation Integration (GPS capture, Maidenhead calculation, real API calls)
+- ❌ **Phase 6.4** - Location Permission Flows (permission request UI and error states)
+- ❌ **Phase 6.5** - Phase 6 Cleanup (address known issues listed above)
+- ❌ **Phase 7+** - Real-Time Updates (Supabase Realtime for auto-updating feed)
+
+**Current Phase**: Phase 6.1 Complete → Phase 6.1A: Playwright Testing Agent Next
 
 ## Project Structure
 
