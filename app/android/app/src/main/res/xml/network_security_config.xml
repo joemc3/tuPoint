@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Network Security Configuration for tuPoint
+
+  This configuration enforces HTTPS-only connections in production builds
+  while allowing localhost connections for local development.
+
+  SECURITY FEATURES:
+  - Blocks all cleartext (HTTP) traffic by default
+  - Allows localhost/emulator access for development
+  - Uses system certificate authorities for SSL/TLS validation
+
+  PRODUCTION DEPLOYMENT:
+  Before deploying to production, consider adding certificate pinning
+  for your Supabase instance. See comments below for implementation.
+
+  References:
+  - https://developer.android.com/training/articles/security-config
+  - https://developer.android.com/training/articles/security-ssl
+-->
+<network-security-config>
+    <!-- Production configuration: Only HTTPS allowed -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <!-- Trust system certificate authorities (Google, Let's Encrypt, etc.) -->
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- Allow localhost for local development and testing -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain> <!-- Android emulator host -->
+        <domain includeSubdomains="true">10.0.3.2</domain> <!-- Genymotion emulator -->
+    </domain-config>
+
+    <!--
+      OPTIONAL: Certificate Pinning for Supabase (Advanced Security)
+
+      WARNING: Only enable if you understand certificate rotation risks.
+      If Supabase rotates certificates and you haven't updated pins,
+      your app will fail to connect until users update.
+
+      To get certificate hashes:
+      openssl s_client -servername YOUR_PROJECT.supabase.co \
+        -connect YOUR_PROJECT.supabase.co:443 < /dev/null | \
+        openssl x509 -pubkey -noout | \
+        openssl pkey -pubin -outform der | \
+        openssl dgst -sha256 -binary | \
+        openssl enc -base64
+
+      Example configuration:
+      <domain-config>
+          <domain includeSubdomains="true">YOUR_PROJECT.supabase.co</domain>
+          <pin-set expiration="2026-12-31">
+              <pin digest="SHA-256">PRIMARY_CERTIFICATE_HASH_HERE=</pin>
+              <pin digest="SHA-256">BACKUP_CERTIFICATE_HASH_HERE=</pin>
+          </pin-set>
+      </domain-config>
+    -->
+</network-security-config>
