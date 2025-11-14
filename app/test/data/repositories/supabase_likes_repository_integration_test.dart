@@ -36,7 +36,7 @@ void main() {
         // Arrange: Create user and point
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-like@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId, username: 'likeuser');
 
@@ -79,7 +79,7 @@ void main() {
         // Arrange: Create user A
         await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'usera-like@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
 
         // Act & Assert: Try to like as user B
@@ -96,7 +96,7 @@ void main() {
         // Arrange
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-likenotfound@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
 
         // Act & Assert
@@ -114,7 +114,7 @@ void main() {
         // Arrange: Create user and point
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-duplicatelike@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId, username: 'duplikeuser');
 
@@ -141,7 +141,7 @@ void main() {
         // Arrange: Create user, point, and like
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-unlike@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId, username: 'unlikeuser');
 
@@ -170,7 +170,7 @@ void main() {
         // Arrange: Create user and point (but no like)
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-unlikeidempotent@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId, username: 'idempotentuser');
 
@@ -209,7 +209,7 @@ void main() {
         // Arrange: Create user A
         await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'usera-unlike@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
 
         // Act & Assert: Try to unlike as user B
@@ -228,7 +228,7 @@ void main() {
         // Arrange: Create user and point
         final userId1 = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'user1-getlikes@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId1, username: 'getlikesuser1');
 
@@ -246,7 +246,7 @@ void main() {
         await SupabaseTestHelper.signOutTestUser();
         final userId2 = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'user2-getlikes@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId2, username: 'getlikesuser2');
 
@@ -264,7 +264,7 @@ void main() {
         // Arrange: Create user and point
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-nolikes@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId, username: 'nolikesuser');
 
@@ -288,7 +288,7 @@ void main() {
         // Arrange: Create user and multiple points
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-userlikes@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId, username: 'userlikesuser');
 
@@ -322,7 +322,7 @@ void main() {
         // Arrange: Create user
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-nouserlik es@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId, username: 'nouserlikesuser');
 
@@ -339,7 +339,7 @@ void main() {
         // Arrange: Create user and point
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-hasliked@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId, username: 'haslikeduser');
 
@@ -366,7 +366,7 @@ void main() {
         // Arrange: Create user and point
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-notliked@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId, username: 'notlikeduser');
 
@@ -391,7 +391,7 @@ void main() {
         // Arrange: Create user, point, and like
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-unlikedagain@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId, username: 'unlikedagainuser');
 
@@ -421,7 +421,7 @@ void main() {
         // Arrange: Create users and point
         final userId1 = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'user1-count@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId1, username: 'countuser1');
 
@@ -437,7 +437,7 @@ void main() {
         await SupabaseTestHelper.signOutTestUser();
         final userId2 = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'user2-count@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId2, username: 'countuser2');
 
@@ -446,7 +446,7 @@ void main() {
         await SupabaseTestHelper.signOutTestUser();
         final userId3 = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'user3-count@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId3, username: 'countuser3');
 
@@ -463,7 +463,7 @@ void main() {
         // Arrange: Create user and point
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-zerocount@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId, username: 'zerocountuser');
 
@@ -485,7 +485,7 @@ void main() {
         // Arrange: Create user and point
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
           email: 'test-decrementcount@example.com',
-          password: 'password123',
+          password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId, username: 'decrementcountuser');
 

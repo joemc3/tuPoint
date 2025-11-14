@@ -51,23 +51,23 @@ void main() {
       test('returns only points within radius', () async {
         // Arrange - Create points at various distances from NYC
         final points = [
-          // ~2km away (Times Square from Central Park)
+          // ~2km away (verified: 2000m)
           createTestPoint(
             id: 'point-1',
             userId: 'user-1',
-            location: LocationCoordinate(latitude: 40.7580, longitude: -73.9855),
+            location: LocationCoordinate(latitude: 40.7255, longitude: -73.9892),
           ),
-          // ~5km away (Brooklyn)
+          // ~4.5km away (verified: 4500m) - within 5km
           createTestPoint(
             id: 'point-2',
             userId: 'user-2',
-            location: LocationCoordinate(latitude: 40.6782, longitude: -73.9442),
+            location: LocationCoordinate(latitude: 40.7128, longitude: -73.9526),
           ),
-          // ~10km away (JFK Airport area - should be excluded)
+          // ~10km away (verified: 10000m) - should be excluded
           createTestPoint(
             id: 'point-3',
             userId: 'user-3',
-            location: LocationCoordinate(latitude: 40.6413, longitude: -73.7781),
+            location: LocationCoordinate(latitude: 40.6492, longitude: -73.9222),
           ),
         ];
 
@@ -145,17 +145,17 @@ void main() {
       test('respects custom radius parameter', () async {
         // Arrange
         final points = [
-          // ~2km away
+          // ~2km away (verified: 2000m)
           createTestPoint(
             id: 'point-1',
             userId: 'user-1',
-            location: LocationCoordinate(latitude: 40.7580, longitude: -73.9855),
+            location: LocationCoordinate(latitude: 40.7255, longitude: -73.9892),
           ),
-          // ~5km away
+          // ~4.5km away (verified: 4500m)
           createTestPoint(
             id: 'point-2',
             userId: 'user-2',
-            location: LocationCoordinate(latitude: 40.6782, longitude: -73.9442),
+            location: LocationCoordinate(latitude: 40.7128, longitude: -73.9526),
           ),
         ];
 
@@ -185,12 +185,12 @@ void main() {
           createTestPoint(
             id: 'point-1',
             userId: currentUserId, // User's own point
-            location: LocationCoordinate(latitude: 40.7580, longitude: -73.9855),
+            location: LocationCoordinate(latitude: 40.7255, longitude: -73.9892),
           ),
           createTestPoint(
             id: 'point-2',
             userId: 'other-user',
-            location: LocationCoordinate(latitude: 40.7580, longitude: -73.9855),
+            location: LocationCoordinate(latitude: 40.7255, longitude: -73.9892),
           ),
         ];
 
@@ -221,12 +221,12 @@ void main() {
           createTestPoint(
             id: 'point-1',
             userId: currentUserId,
-            location: LocationCoordinate(latitude: 40.7580, longitude: -73.9855),
+            location: LocationCoordinate(latitude: 40.7255, longitude: -73.9892),
           ),
           createTestPoint(
             id: 'point-2',
             userId: 'other-user',
-            location: LocationCoordinate(latitude: 40.7580, longitude: -73.9855),
+            location: LocationCoordinate(latitude: 40.7255, longitude: -73.9892),
           ),
         ];
 
@@ -254,12 +254,12 @@ void main() {
           createTestPoint(
             id: 'point-1',
             userId: 'user-1',
-            location: LocationCoordinate(latitude: 40.7580, longitude: -73.9855),
+            location: LocationCoordinate(latitude: 40.7255, longitude: -73.9892),
           ),
           createTestPoint(
             id: 'point-2',
             userId: 'user-2',
-            location: LocationCoordinate(latitude: 40.7580, longitude: -73.9855),
+            location: LocationCoordinate(latitude: 40.7255, longitude: -73.9892),
           ),
         ];
 
@@ -284,23 +284,23 @@ void main() {
       test('sorts points by distance from nearest to farthest', () async {
         // Arrange - Points at different distances
         final points = [
-          // Farthest (~5km)
+          // Farthest (~4.5km - verified: 4500m)
           createTestPoint(
             id: 'point-far',
             userId: 'user-1',
-            location: LocationCoordinate(latitude: 40.6782, longitude: -73.9442),
+            location: LocationCoordinate(latitude: 40.7128, longitude: -73.9526),
           ),
-          // Closest (~1km)
+          // Closest (~1.1km - verified: 1100m)
           createTestPoint(
             id: 'point-close',
             userId: 'user-2',
             location: LocationCoordinate(latitude: 40.7228, longitude: -74.0060),
           ),
-          // Middle (~2km)
+          // Middle (~2km - verified: 2000m)
           createTestPoint(
             id: 'point-medium',
             userId: 'user-3',
-            location: LocationCoordinate(latitude: 40.7580, longitude: -73.9855),
+            location: LocationCoordinate(latitude: 40.7255, longitude: -73.9892),
           ),
         ];
 
@@ -492,25 +492,25 @@ void main() {
         const currentUserId = 'current-user';
 
         final points = [
-          // Close, not user's
+          // Close, not user's (~1.1km)
           createTestPoint(
             id: 'point-1',
             userId: 'other-user',
             location: LocationCoordinate(latitude: 40.7228, longitude: -74.0060),
           ),
-          // Close, user's own (should be excluded)
+          // Close, user's own (~1.1km) - should be excluded by ownership
           createTestPoint(
             id: 'point-2',
             userId: currentUserId,
             location: LocationCoordinate(latitude: 40.7228, longitude: -74.0060),
           ),
-          // Far, not user's (should be excluded by distance)
+          // Far, not user's (~3900km) - should be excluded by distance
           createTestPoint(
             id: 'point-3',
             userId: 'other-user',
             location: LocationCoordinate(latitude: 34.0522, longitude: -118.2437),
           ),
-          // Far, user's own (should be excluded by both filters)
+          // Far, user's own (~3900km) - should be excluded by both filters
           createTestPoint(
             id: 'point-4',
             userId: currentUserId,
