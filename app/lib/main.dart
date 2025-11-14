@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -28,11 +29,19 @@ Future<void> main() async {
   // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Validate environment configuration
+  if (!EnvConfig.isValid) {
+    throw Exception(
+      'Missing required environment variables. '
+      'Please ensure SUPABASE_URL and SUPABASE_ANON_KEY are set.',
+    );
+  }
+
   // Initialize Supabase
   await Supabase.initialize(
     url: EnvConfig.supabaseUrl,
     anonKey: EnvConfig.supabaseAnonKey,
-    debug: true, // Enable debug logging for development
+    debug: kDebugMode, // Enable debug logging only in debug builds
   );
 
   // Run app wrapped in ProviderScope for Riverpod
