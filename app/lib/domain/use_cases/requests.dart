@@ -31,6 +31,24 @@ class FetchProfileRequest {
   FetchProfileRequest({required this.userId});
 }
 
+/// Request to update a user's profile.
+class UpdateProfileRequest {
+  /// User ID of the authenticated user (must own the profile)
+  final String userId;
+
+  /// New username (optional, will be validated if provided)
+  final String? username;
+
+  /// New bio (optional)
+  final String? bio;
+
+  UpdateProfileRequest({
+    required this.userId,
+    this.username,
+    this.bio,
+  });
+}
+
 /// Request to create a new Point.
 class DropPointRequest {
   /// User ID of the authenticated user

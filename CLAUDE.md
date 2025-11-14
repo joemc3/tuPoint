@@ -38,17 +38,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Codebase Statistics
 
-- **Total Dart Files**: 62 files (~13,000 lines of code, excluding generated files)
+- **Total Dart Files**: 74 files (~16,000 lines of code, excluding generated files)
 - **Screens**: 3 complete screens (Auth Gate, Main Feed, Point Creation)
 - **Reusable Widgets**: 1 component (PointCard)
-- **Domain Entities**: 6 core models (Profile, Point, Like, AuthState, LocationPermissionState, LocationServiceState) + generated Freezed/JSON files
+- **Domain Entities**: 10 core models (Profile, Point, Like, AuthState, ProfileState, PointDropState, FeedState, LikeState, LocationPermissionState, LocationServiceState) + generated Freezed/JSON files
 - **Repository Interfaces**: 3 contracts (IPointsRepository, IProfileRepository, ILikesRepository)
 - **Repository Implementations**: 3 Supabase implementations (~915 lines)
 - **Core Services**: 1 (LocationService for GPS and permissions - 318 lines)
-- **Riverpod Providers**: 16 providers (Supabase + 3 repositories + 6 auth + 6 location)
-- **State Notifiers**: 1 (AuthNotifier for authentication state management)
-- **Use Cases**: 8 business logic classes (Profile: 2, Point: 3, Like: 3)
-- **Request DTOs**: 8 strongly-typed request objects
+- **Riverpod Providers**: 27 providers across 5 provider files (Supabase + 3 repositories + 6 auth + 6 location + 4 profile + 7 point/feed/like)
+- **State Notifiers**: 5 notifiers (~2,500 lines total)
+  - AuthNotifier (346 lines) - Authentication state
+  - ProfileNotifier - Profile fetch/update
+  - PointDropNotifier - Point creation with GPS
+  - FeedNotifier - Nearby points filtering
+  - LikeNotifier - Like/unlike with optimistic updates
+- **Use Cases**: 11 business logic classes (Profile: 3, Point: 3, Like: 3, GetLikeCount: 1, FetchNearbyPoints: 1)
+- **Request DTOs**: 9 strongly-typed request objects (added UpdateProfileRequest)
 - **Geospatial Utilities**: 3 utilities (MaidenheadConverter, HaversineCalculator, DistanceFormatter)
 - **Value Objects**: 1 immutable type (LocationCoordinate)
 - **Domain Exceptions**: 7 exception classes
@@ -62,12 +67,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - ✅ **Integration Tests**: 58 tests (repository implementations with real database)
 - **Test Pass Rate**: 355/369 passing (96.2%)
 - **Specialized AI Agents**: 8 agents for architecture domains
-- **Specification Documents**: 8 comprehensive spec files in `project_standards/` (including AUTH_ARCHITECTURE.md)
+- **Specification Documents**: 9 comprehensive spec files in `project_standards/` (including AUTH_ARCHITECTURE.md, STATE_MANAGEMENT_IMPLEMENTATION.md)
 - **Theme Variants**: 2 modes (Light "BLUE IMMERSION", Dark "BLUE ELECTRIC")
 
 ## Current Status
 
-**Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Complete → **State Management In Progress** (Auth + Location Complete → Profile/Point State Next)
+**Development Phase**: Database Setup Complete → Domain Layer Complete → Data Layer Complete → **State Management COMPLETE** (Phase 5.1-5.4) → UI Integration Next
 
 ### Completed (Phase 0-4): ✅
 
@@ -155,7 +160,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ Widget Tests: 21 tests
 - ✅ Integration Tests: 58 tests (real database)
 
-**State Management Layer (Phase 5): 🔄 IN PROGRESS**
+**State Management Layer (Phase 5): ✅ COMPLETE**
 
 **Repository Providers (Phase 5.1): ✅ COMPLETE**
 - ✅ **Supabase Initialization** - App-wide Supabase client initialization in main.dart
@@ -203,15 +208,62 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ **Test Coverage** - 24 tests for location state models (100% pass rate)
 - ✅ **Documentation** - 3 comprehensive guides (README, Quick Start, Summary)
 
-**Next Steps (Phase 5.4+):**
-- ❌ **Profile State Management** (ProfileNotifier, profile creation/update flows)
-- ❌ **Point Creation State** (DropPointNotifier with location integration)
-- ❌ **Feed State** (FetchNearbyPointsUseCase with 5km filtering using location stream)
-- ❌ **Like/Unlike State** (LikeNotifier, toggle functionality)
-- ❌ **Business Logic Wiring** (connect state to UI screens)
-- ❌ **UI Integration** (wire location, auth, and data providers to screens)
+**Application State (Phase 5.4): ✅ COMPLETE**
+- ✅ **ProfileState Model** - Freezed union type (initial, loading, loaded, error)
+- ✅ **ProfileNotifier** - StateNotifier for profile operations
+  - Fetch user profiles by ID
+  - Update profile (username, bio)
+  - User-friendly error mapping
+- ✅ **UpdateProfileUseCase** - Profile update business logic with validation
+- ✅ **Profile Providers** - 4 Riverpod providers in `profile_providers.dart`:
+  - `updateProfileUseCaseProvider` - UpdateProfileUseCase instance
+  - `profileNotifierProvider` - Main profile state notifier
+  - `profileStateProvider` - Convenience provider for current state
+  - `currentProfileProvider` - Extracts Profile from loaded state
+- ✅ **PointDropState Model** - Freezed union type (initial, fetchingLocation, dropping, success, error)
+- ✅ **PointDropNotifier** - StateNotifier for point creation with GPS integration
+  - Two-phase operation (GPS fetch → database create)
+  - Automatic Maidenhead conversion
+  - Location service integration
+- ✅ **FeedState Model** - Freezed union type (initial, loading, loaded with location, error)
+- ✅ **FeedNotifier** - StateNotifier for nearby points feed
+  - 5km radius filtering via HaversineCalculator
+  - Real-time location integration
+  - Excludes user's own points
+  - Sorted by distance (nearest first)
+- ✅ **LikeState Model** - Freezed data class for per-point like tracking
+- ✅ **LikeNotifier** - StateNotifier for like/unlike with optimistic updates
+  - Instant UI feedback (optimistic updates)
+  - Automatic rollback on errors
+  - Per-point independent state
+  - Concurrent like operations supported
+- ✅ **Point Providers** - 16 providers in `point_providers.dart`:
+  - Use case providers (5): drop, fetchNearby, like, unlike, getLikeCount
+  - Point drop providers (3): notifier, state, isDropping
+  - Feed providers (4): notifier, state, nearbyPoints, isLoading
+  - Like providers (4): notifier, state, pointLikeStatus (family), pointLikeCount (family)
+- ✅ **Comprehensive Documentation** - 73KB STATE_MANAGEMENT_IMPLEMENTATION.md with:
+  - Complete architecture documentation
+  - 15+ usage examples
+  - Data flow diagrams
+  - Error handling strategies
+  - Testing guidelines
+  - Integration checklist
 
-**Current Phase**: Location Services Complete → Profile/Point State Management Next
+**State Management Summary:**
+- **7 State Models**: AuthState, ProfileState, PointDropState, FeedState, LikeState, LocationPermissionState, LocationServiceState
+- **5 Notifiers**: AuthNotifier, ProfileNotifier, PointDropNotifier, FeedNotifier, LikeNotifier (~2,500 lines)
+- **27 Providers**: Across 5 provider files (repository, auth, location, profile, point/feed/like)
+- **11 Use Cases**: All wired into state layer
+
+**Next Steps (Phase 6+):**
+- ❌ **UI Integration** - Wire state providers into Auth Gate, Main Feed, Point Creation screens
+- ❌ **Permission Flows** - Add location permission request UI
+- ❌ **Testing** - Unit tests for notifiers, integration tests for providers
+- ❌ **Real-Time Updates** - Integrate Supabase Realtime for auto-updating feed
+- ❌ **Error Display** - Implement user-friendly error messages throughout UI
+
+**Current Phase**: State Management Complete (Phase 5.1-5.4) → UI Integration Next
 
 ## Project Structure
 
@@ -223,18 +275,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   │   ├── core/
 │   │   │   ├── config/          # Environment configuration
 │   │   │   ├── constants/       # App-wide constants (spacing, sizes, colors)
-│   │   │   ├── providers/       # Riverpod providers ✅
+│   │   │   ├── providers/       # Riverpod providers ✅ (27 total)
 │   │   │   │   ├── repository_providers.dart    # Repository providers (4 providers)
 │   │   │   │   ├── auth_providers.dart          # Authentication providers (6 providers)
-│   │   │   │   └── location_providers.dart      # Location providers (6 providers)
+│   │   │   │   ├── location_providers.dart      # Location providers (6 providers)
+│   │   │   │   ├── profile_providers.dart       # Profile providers (4 providers)
+│   │   │   │   └── point_providers.dart         # Point/Feed/Like providers (16 providers)
 │   │   │   ├── services/        # Core services ✅
 │   │   │   │   ├── location_service.dart        # GPS and permission service (318 lines)
 │   │   │   │   └── LOCATION_SERVICES_README.md  # Location services documentation
 │   │   │   └── theme/           # Material 3 theme v3.0 (BLUE DOMINANCE)
 │   │   ├── presentation/
-│   │   │   ├── notifiers/       # State management notifiers ✅
+│   │   │   ├── notifiers/       # State management notifiers ✅ (5 total, ~2,500 lines)
 │   │   │   │   ├── auth_notifier.dart           # Authentication state notifier (346 lines)
-│   │   │   │   └── README.md                    # Notifier usage documentation
+│   │   │   │   ├── profile_notifier.dart        # Profile state notifier
+│   │   │   │   ├── point_drop_notifier.dart     # Point creation notifier
+│   │   │   │   ├── feed_notifier.dart           # Feed state notifier
+│   │   │   │   ├── like_notifier.dart           # Like/unlike notifier
+│   │   │   │   ├── README.md                    # Notifier usage documentation
+│   │   │   │   └── LIKE_NOTIFIER_README.md      # Like notifier detailed guide
 │   │   │   ├── screens/         # Auth, MainFeed, PointCreation screens
 │   │   │   └── widgets/         # Reusable PointCard component
 │   │   ├── domain/              # Domain layer (business logic)
@@ -244,11 +303,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   │   │   │   └── distance_formatter.dart
 │   │   │   ├── value_objects/   # Immutable value objects ✅
 │   │   │   │   └── location_coordinate.dart
-│   │   │   ├── entities/        # Domain entities with Freezed ✅
-│   │   │   │   ├── profile.dart (+ .freezed.dart, .g.dart)
-│   │   │   │   ├── point.dart (+ .freezed.dart, .g.dart)
-│   │   │   │   ├── like.dart (+ .freezed.dart, .g.dart)
+│   │   │   ├── entities/        # Domain entities with Freezed ✅ (10 total)
+│   │   │   │   ├── profile.dart (+ .freezed.dart, .g.dart)             # User profile entity
+│   │   │   │   ├── point.dart (+ .freezed.dart, .g.dart)               # Location post entity
+│   │   │   │   ├── like.dart (+ .freezed.dart, .g.dart)                # Like relationship entity
 │   │   │   │   ├── auth_state.dart (+ .freezed.dart)                   # Authentication state model
+│   │   │   │   ├── profile_state.dart (+ .freezed.dart)                # Profile operation state
+│   │   │   │   ├── point_drop_state.dart (+ .freezed.dart)             # Point creation state
+│   │   │   │   ├── feed_state.dart (+ .freezed.dart)                   # Feed display state
+│   │   │   │   ├── like_state.dart (+ .freezed.dart)                   # Like/unlike state
 │   │   │   │   ├── location_permission_state.dart (+ .freezed.dart)    # Location permission states
 │   │   │   │   └── location_service_state.dart (+ .freezed.dart)       # Location service states
 │   │   │   ├── exceptions/      # Domain exceptions ✅
@@ -257,11 +320,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   │   │   │   ├── i_points_repository.dart
 │   │   │   │   ├── i_profile_repository.dart
 │   │   │   │   └── i_likes_repository.dart
-│   │   │   └── use_cases/       # Business logic use cases ✅
-│   │   │       ├── profile_use_cases/    # CreateProfileUseCase, FetchProfileUseCase
+│   │   │   └── use_cases/       # Business logic use cases ✅ (11 total)
+│   │   │       ├── profile_use_cases/    # CreateProfileUseCase, FetchProfileUseCase, UpdateProfileUseCase
 │   │   │       ├── point_use_cases/      # DropPointUseCase, FetchNearbyPointsUseCase, FetchUserPointsUseCase
 │   │   │       ├── like_use_cases/       # LikePointUseCase, UnlikePointUseCase, GetLikeCountUseCase
-│   │   │       ├── requests.dart         # 8 request DTOs
+│   │   │       ├── requests.dart         # 9 request DTOs (added UpdateProfileRequest)
 │   │   │       └── use_case_base.dart    # Abstract UseCase<Success, Request> base class
 │   │   └── data/                # Data layer ✅
 │   │       └── repositories/    # Supabase repository implementations ✅
@@ -297,6 +360,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   ├── architecture_and_state_management.md
 │   ├── api_strategy.md
 │   ├── AUTH_ARCHITECTURE.md     # Authentication architecture diagrams and flows
+│   ├── STATE_MANAGEMENT_IMPLEMENTATION.md    # Complete state management reference (73KB)
 │   ├── product_requirements_document(PRD).md
 │   ├── tuPoint_data_schema.md
 │   ├── UX_user_flow.md
