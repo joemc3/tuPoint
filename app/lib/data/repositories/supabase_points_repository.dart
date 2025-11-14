@@ -167,10 +167,13 @@ class SupabasePointsRepository implements IPointsRepository {
       }
 
       // First verify the point exists and is owned by the user
+      // Note: We need to select ALL columns to bypass the RLS SELECT filter
+      // that only returns is_active = true
       final existing = await _client
           .from('points')
-          .select('user_id')
+          .select('user_id, is_active')
           .eq('id', pointId)
+          .eq('user_id', userId)
           .maybeSingle();
 
       if (existing == null) {
@@ -184,6 +187,9 @@ class SupabasePointsRepository implements IPointsRepository {
       }
 
       // Update is_active to false (soft delete)
+      // Note: We cannot use .select() after the update because the RLS SELECT policy
+      // only allows viewing active points (is_active = true), so the updated row
+      // would be filtered out immediately after being set to inactive.
       await _client
           .from('points')
           .update({'is_active': false})

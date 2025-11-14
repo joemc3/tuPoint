@@ -321,7 +321,7 @@ void main() {
       test('returns empty list when user has not liked anything', () async {
         // Arrange: Create user
         final userId = await SupabaseTestHelper.createAuthenticatedTestUser(
-          email: 'test-nouserlik es@example.com',
+          email: 'test-nouserlikes@example.com',
           password: 'TestPass123',
         );
         await profileRepository.createProfile(id: userId, username: 'nouserlikesuser');
